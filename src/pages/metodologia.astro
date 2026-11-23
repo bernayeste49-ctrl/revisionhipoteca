@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { latestYm, monthLabel } from '../lib/euribor.js';
+---
+<Base title="Metodología: datos y fórmulas de Revisión Hipoteca" description="De dónde sale el euríbor que mostramos, cuándo se actualiza y qué fórmulas usan las calculadoras de hipoteca.">
+  <Breadcrumbs items={[['Metodología']]} />
+  <h1>Metodología</h1>
+  <section class="prose">
+    <h2>Fuente del euríbor</h2>
+    <p>Mostramos el valor mensual del <strong>euríbor a un año</strong> que el Banco de España difunde como tipo de interés de referencia oficial del mercado hipotecario (Orden EHA/2899/2011 y Circular 5/2012), y que adquiere carácter oficial al publicarse en el BOE. Lo descargamos de las <a href="https://www.bde.es/webbe/es/estadisticas/otras-clasificaciones/publicaciones/boletin-estadistico/capitulo-19.html" rel="nofollow noopener" target="_blank">series del Boletín Estadístico del Banco de España (cuadro 19.1)</a>.</p>
+    <p>No publicamos valores diarios del euríbor: el dato mensual es el que utilizan los contratos de hipoteca. Último dato disponible: {monthLabel(latestYm)}.</p>
+    <h2>Cuándo se actualiza</h2>
+    <p>El Banco de España publica el dato de cada mes durante los primeros días del mes siguiente. Nuestro sistema lo comprueba cada día y actualiza la web automáticamente.</p>
+    <h2>Fórmulas</h2>
+    <ul>
+      <li><strong>Cuota:</strong> sistema de amortización francés, cuota = C · i / (1 − (1 + i)<sup>−n</sup>), con i = tipo anual / 12 y n = meses pendientes.</li>
+      <li><strong>Revisión:</strong> tipo nuevo = euríbor del mes de referencia + diferencial (con un mínimo de 0 %). La cuota «hasta ahora» se estima con el euríbor del periodo anterior y el mismo capital pendiente, por lo que puede diferir en unos euros de la tuya.</li>
+      <li><strong>Amortización anticipada:</strong> reducción de cuota manteniendo el plazo, o reducción de plazo manteniendo la cuota, restando la comisión indicada.</li>
+    </ul>
+    <h2>Limitaciones</h2>
+    <p>Los resultados son estimaciones. No tienen en cuenta cláusulas suelo, redondeos, bonificaciones variables ni el cálculo exacto por días de cada entidad. No constituyen asesoramiento financiero. Si detectas un error, escríbenos a hola@revisionhipoteca.es.</p>
+  </section>
+</Base>

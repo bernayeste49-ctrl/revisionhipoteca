@@ -1,0 +1,37 @@
+---
+// Línea simple del euríbor oficial a 12 meses en los últimos N meses
+import { series, monthShort, pct } from '../lib/euribor.js';
+interface Props { n?: number; caption?: string }
+const { n = 24, caption } = Astro.props;
+const s = series().slice(-n);
+const W = 720, H = 220, P = { l: 44, r: 14, t: 16, b: 30 };
+const vs = s.map((d) => d.v);
+const lo = Math.floor(Math.min(...vs) * 2) / 2, hi = Math.ceil(Math.max(...vs) * 2) / 2 || lo + 0.5;
+const x = (i) => P.l + (i * (W - P.l - P.r)) / (s.length - 1);
+const y = (v) => P.t + ((hi - v) * (H - P.t - P.b)) / (hi - lo || 1);
+const pts = s.map((d, i) => `${x(i).toFixed(1)},${y(d.v).toFixed(1)}`).join(' ');
+const ticks = [];
+for (let t = lo; t <= hi + 1e-9; t += (hi - lo) > 2 ? 1 : 0.5) ticks.push(t);
+const last = s.at(-1);
+---
+<figure class="chart">
+  <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Euríbor a 12 meses: de ${pct(s[0].v)} en ${monthShort(s[0].ym)} a ${pct(last.v)} en ${monthShort(last.ym)}`}>
+    {ticks.map((t) => (<g><line x1={P.l} x2={W - P.r} y1={y(t)} y2={y(t)} class="grid" /><text x={P.l - 8} y={y(t) + 4} class="ytick">{t.toLocaleString('es-ES', { minimumFractionDigits: 1 })}</text></g>))}
+    {s.map((d, i) => (i % 3 === (s.length - 1) % 3) && <text x={x(i)} y={H - 8} class="xtick">{monthShort(d.ym)}</text>)}
+    <polyline points={pts} class="line" />
+    <circle cx={x(s.length - 1)} cy={y(last.v)} r="4.5" class="dot" />
+    <text x={x(s.length - 1) - 8} y={y(last.v) - 10} class="lbl">{pct(last.v)}</text>
+  </svg>
+  {caption && <figcaption class="muted">{caption}</figcaption>}
+</figure>
+<style>
+  .chart { margin: 12px 0 0; }
+  svg { width: 100%; height: auto; display: block; }
+  .grid { stroke: var(--line); stroke-width: 1; }
+  .ytick { font-size: 11px; fill: var(--muted); text-anchor: end; }
+  .xtick { font-size: 11px; fill: var(--muted); text-anchor: middle; }
+  .line { fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linejoin: round; }
+  .dot { fill: var(--coral); }
+  .lbl { font-size: 13px; font-weight: 700; fill: var(--ink); text-anchor: end; }
+  figcaption { font-size: 0.85rem; margin-top: 6px; }
+</style>

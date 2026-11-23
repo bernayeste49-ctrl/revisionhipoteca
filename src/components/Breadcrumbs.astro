@@ -1,0 +1,14 @@
+---
+interface Props { items: [string, string?][] }
+const { items } = Astro.props;
+const all: [string, string?][] = [['Inicio', '/'], ...items];
+const ld = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: all.map(([name, href], i) => ({ '@type': 'ListItem', position: i + 1, name, ...(href ? { item: new URL(href, Astro.site).href } : {}) })) };
+---
+<nav class="crumbs" aria-label="Migas de pan">
+  {all.map(([name, href], i) => (<>{i > 0 && <span aria-hidden="true"> › </span>}{href && i < all.length - 1 ? <a href={href}>{name}</a> : <span>{name}</span>}</>))}
+</nav>
+<script type="application/ld+json" set:html={JSON.stringify(ld)} />
+<style>
+  .crumbs { font-size: 0.85rem; color: var(--muted); margin-bottom: 8px; }
+  .crumbs a { color: var(--muted); }
+</style>

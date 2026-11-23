@@ -1,0 +1,34 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import GuideMeta from '../../components/GuideMeta.astro';
+import { latestYm, value, monthLabel, shiftYm, pct, signed, cuota, eur } from '../../lib/euribor.js';
+import { articleLd, faqLd } from '../../lib/seo.js';
+const eu = value(latestYm), eu12 = value(shiftYm(latestYm, -12));
+const updated = new Date().toISOString().slice(0, 10);
+const path = '/guias/que-es-el-euribor/';
+const title = `Qué es el euríbor y cómo afecta a tu hipoteca (dato oficial: ${pct(eu)})`;
+const description = `Qué es el euríbor, quién lo calcula, qué valor usan los bancos para las hipotecas y dónde se publica el dato oficial. Último: ${pct(eu)} en ${monthLabel(latestYm)}.`;
+const faqs = [["¿Quién decide el euríbor?", "Nadie lo fija a voluntad: lo calcula cada día el Instituto Europeo de Mercados Monetarios (EMMI) a partir de las operaciones de un grupo de bancos. Sí influye mucho la política de tipos del Banco Central Europeo."], ["¿Qué diferencia hay entre el euríbor diario y el mensual?", "El diario cambia cada día hábil. Para las hipotecas se usa el valor oficial mensual, que es la media de los valores diarios del mes y que publica el Banco de España en el BOE."], ["¿El euríbor va a subir o a bajar?", "Nadie puede saberlo con certeza. Depende sobre todo de la inflación en la zona euro y de lo que decida el Banco Central Europeo. Desconfía de las previsiones presentadas como seguras."]];
+---
+<Base title={title} {description} jsonLd={[articleLd({ title, description, path, updated }), faqLd(faqs)]}>
+  <Breadcrumbs items={[['Guías', '/guias/'], ['Qué es el euríbor']]} />
+  <h1>Qué es el euríbor y cómo afecta a tu hipoteca</h1>
+  <GuideMeta updated={updated} sources={[["Banco de España, Portal del Cliente Bancario: tipos de referencia oficiales", "https://clientebancario.bde.es/pcb/es/menu-horizontal/podemosayudarte/tiposinteres/guia_textual/tiposinteresreferenciaotrostiposfrecuentes/tabla_tipos_referencia_oficiales_mercado_hipotecario.html"], ["Banco de España: definición del euríbor", "https://www.bde.es/webbe/es/estadisticas/recursos/glosario/conceptos/euribor.html"], ["EMMI: Euribor", "https://www.emmi-benchmarks.eu/benchmarks/euribor/rate/"]]}>
+  <section class="prose">
+    <p class="lead">El euríbor es el tipo de interés al que los bancos europeos se prestan dinero entre sí. En España es la referencia de casi todas las hipotecas variables. Su valor oficial a un año en {monthLabel(latestYm)} es <strong>{pct(eu)}</strong>.</p>
+    <h2>Quién lo calcula</h2>
+    <p>Lo administra el Instituto Europeo de Mercados Monetarios (EMMI), que lo calcula cada día hábil para varios plazos (una semana, uno, tres, seis y doce meses) con un método basado sobre todo en operaciones reales del mercado.</p>
+    <h2>Qué euríbor usa tu hipoteca</h2>
+    <p>Casi siempre el <strong>euríbor a un año</strong> en su valor mensual oficial: la media de los valores diarios de un mes, que el Banco de España publica en el BOE como tipo de referencia oficial del mercado hipotecario. Es el dato que mostramos en el <a href="/euribor/">histórico mes a mes</a>.</p>
+    <h2>Cómo afecta a tu cuota</h2>
+    <p>Tu tipo de interés es el euríbor más tu <a href="/guias/diferencial-hipoteca/">diferencial</a>. Cada punto que sube el euríbor encarece bastante la cuota: en una hipoteca de 150.000 € a 25 años, pasar de un tipo del 3 % al 4 % sube la cuota de {eur(cuota(150000, 3, 300))} a {eur(cuota(150000, 4, 300))} al mes.</p>
+    <p>Calcula tu próxima cuota en la <a href="/">calculadora de la revisión</a>.</p>
+    <h2>Por qué sube y baja</h2>
+    <p>Sigue de cerca los tipos del Banco Central Europeo: cuando el BCE sube los tipos para frenar la inflación, el euríbor sube; cuando los baja, el euríbor tiende a bajar. Los mercados se anticipan, así que el euríbor suele moverse antes que el BCE.</p>
+
+    <h2>Preguntas frecuentes</h2>
+    {faqs.map(([q, a]) => (<details><summary>{q}</summary><p>{a}</p></details>))}
+  </section>
+  </GuideMeta>
+</Base>

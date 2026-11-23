@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://revisionhipoteca.es/sitemap-index.xml

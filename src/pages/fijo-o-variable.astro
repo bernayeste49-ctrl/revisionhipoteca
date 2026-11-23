@@ -1,0 +1,72 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import CalcStyles from '../components/CalcStyles.astro';
+import { latestYm, value, monthLabel, pct, series, raw } from '../lib/euribor.js';
+import { faqLd } from '../lib/seo.js';
+const eu = value(latestYm);
+const s = series();
+const avg10 = s.slice(-120).reduce((a, d) => a + d.v, 0) / Math.min(120, s.length);
+const faqs = [
+  ['¿Qué es mejor, hipoteca fija o variable?', 'Depende de lo que pase con el euríbor, que nadie sabe con certeza. La fija te da una cuota igual durante toda la vida del préstamo; la variable suele empezar con un tipo más bajo, pero la cuota sube o baja en cada revisión. Si una subida de la cuota te pondría en apuros, la fija te protege.'],
+  ['¿Qué es una hipoteca mixta?', 'Una hipoteca con tipo fijo los primeros años (normalmente de 3 a 15) y variable después. Combina la seguridad inicial con el riesgo del euríbor a largo plazo.'],
+  ['¿Puedo cambiar mi hipoteca de variable a fija?', 'Sí, negociándolo con tu banco (novación) o llevándote la hipoteca a otro (subrogación). La ley limita las comisiones de estos cambios; pregunta a tu banco el coste exacto.'],
+];
+---
+<Base title="¿Hipoteca fija o variable? Calculadora para comparar cuotas y coste total" description={`Compara lo que pagarías con una hipoteca a tipo fijo y con una variable según distintos escenarios del euríbor (oficial de ${monthLabel(latestYm)}: ${pct(eu)}).`} jsonLd={faqLd(faqs)}>
+  <CalcStyles />
+  <Breadcrumbs items={[['Fijo o variable']]} />
+  <h1>¿Hipoteca fija o variable?</h1>
+  <p class="lead">Pon las dos ofertas y mira qué pagarías con cada una si el euríbor se mantiene, sube o baja durante toda la hipoteca.</p>
+  <div class="calc-wrap">
+    <form class="calc-form" id="f" autocomplete="off">
+      <div class="field full"><label for="capital">Importe de la hipoteca</label><input id="capital" inputmode="numeric" value="180.000" /></div>
+      <div class="field full"><label for="anos">Plazo en años</label><input id="anos" inputmode="numeric" value="25" /></div>
+      <div class="field"><label for="fijo">Tipo fijo (TIN)</label><input id="fijo" inputmode="decimal" value="2,90" /></div>
+      <div class="field"><label for="dif">Variable: diferencial</label><input id="dif" inputmode="decimal" value="0,75" /><span class="hint">Euríbor + este %.</span></div>
+    </form>
+    <div class="res" aria-live="polite">
+      <p class="label">Cuota fija durante toda la hipoteca</p>
+      <p class="big" id="o-fijo">—</p>
+      <p class="muted" id="o-fijo-tot"></p>
+    </div>
+  </div>
+  <h2>La variable en cuatro escenarios</h2>
+  <p class="muted">Suponiendo que el euríbor se queda en ese valor durante toda la hipoteca. Es una simplificación: en la realidad cambiará cada año.</p>
+  <div class="table-scroll"><table><thead><tr><th>Si el euríbor se queda en…</th><th class="num">Cuota variable</th><th class="num">Frente a la fija</th><th class="num">Total de intereses</th><th class="num">Diferencia total</th></tr></thead><tbody id="o-tab"></tbody></table></div>
+  <section class="prose">
+    <h2>Cómo usar esta comparación</h2>
+    <ul>
+      <li><strong>El escenario «actual»</strong> usa el euríbor oficial de {monthLabel(latestYm)} ({pct(eu)}).</li>
+      <li><strong>La media de 10 años</strong> ({pct(avg10)}) incluye años con el euríbor negativo, así que es un escenario optimista para la variable.</li>
+      <li>Fíjate sobre todo en la columna <strong>«Frente a la fija»</strong> del peor escenario: es la subida de cuota que tendrías que poder asumir.</li>
+    </ul>
+    <p>Para ver cómo ha cambiado el euríbor en el pasado, consulta el <a href="/euribor/">histórico mes a mes</a>. Para calcular una sola cuota, usa la <a href="/calculadora-cuota-hipoteca/">calculadora de cuota</a>.</p>
+    <h2>Preguntas frecuentes</h2>
+    {faqs.map(([q, a]) => (<details><summary>{q}</summary><p>{a}</p></details>))}
+  </section>
+</Base>
+<script is:inline type="application/json" id="d" set:html={JSON.stringify({ eu, avg10 })}></script>
+<script>
+  const { eu, avg10 } = JSON.parse(document.getElementById('d')!.textContent!);
+  const num = (s: string) => parseFloat(s.replace(/\./g, '').replace(',', '.'));
+  const eur = (v: number, d = 2) => v.toLocaleString('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d }) + ' €';
+  const pc = (v: number) => v.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' %';
+  const cuota = (P: number, t: number, n: number) => { const r = t / 100 / 12; return r === 0 ? P / n : (P * r) / (1 - Math.pow(1 + r, -n)); };
+  const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+  function calc() {
+    const P = num($('capital').value), n = Math.round(num($('anos').value) * 12), f = num($('fijo').value), dif = num($('dif').value);
+    if (!(P > 0) || !(n > 0) || Number.isNaN(f) || Number.isNaN(dif)) return;
+    const cf = cuota(P, f, n), intF = cf * n - P;
+    $('o-fijo').innerHTML = eur(cf) + '<small>al mes</small>';
+    $('o-fijo-tot').textContent = `Total de intereses: ${eur(intF, 0)}`;
+    const esc: [string, number][] = [['Media de los últimos 10 años', avg10], ['Baja 1 punto', Math.max(eu - 1, -0.5)], ['Se queda como ahora', eu], ['Sube 1 punto', eu + 1]];
+    document.getElementById('o-tab')!.innerHTML = esc.map(([name, e]) => {
+      const cv = cuota(P, Math.max(0, e + dif), n), iv = cv * n - P, d = cv - cf, dt = iv - intF;
+      const cls = (x: number) => (x > 0 ? 'up' : 'down');
+      return `<tr><td>${name} (${pc(e)})</td><td class="num"><strong>${eur(cv)}</strong></td><td class="num ${cls(d)}">${d > 0 ? '+' : '−'}${eur(Math.abs(d))}</td><td class="num">${eur(iv, 0)}</td><td class="num ${cls(dt)}">${dt > 0 ? '+' : '−'}${eur(Math.abs(dt), 0)}</td></tr>`;
+    }).join('');
+  }
+  document.getElementById('f')!.addEventListener('input', calc);
+  calc();
+</script>

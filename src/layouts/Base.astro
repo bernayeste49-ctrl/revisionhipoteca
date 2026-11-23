@@ -1,0 +1,158 @@
+---
+import '@fontsource-variable/bricolage-grotesque';
+interface Props { title: string; description: string; jsonLd?: object | object[]; noindex?: boolean }
+const { title, description, jsonLd, noindex = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const lds = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+const path = Astro.url.pathname;
+const nav = [
+  ['/', 'Revisión'],
+  ['/calculadora-cuota-hipoteca/', 'Cuota'],
+  ['/fijo-o-variable/', 'Fijo o variable'],
+  ['/amortizar-hipoteca/', 'Amortizar'],
+  ['/euribor/', 'Euríbor'],
+  ['/guias/', 'Guías'],
+];
+const year = new Date().getFullYear();
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#141a33" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:site_name" content="Revisión Hipoteca" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content="https://revisionhipoteca.es/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    {lds.map((ld) => <script type="application/ld+json" set:html={JSON.stringify(ld)} />)}
+  </head>
+  <body>
+    <a class="skip" href="#contenido">Saltar al contenido</a>
+    <header class="site-header">
+      <div class="wrap bar">
+        <a class="brand" href="/" aria-label="Revisión Hipoteca, inicio">
+          <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#141a33"/><path d="M8 21.5 14 15l4 4 6-7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="11.5" r="2.6" fill="#ff5a5f"/></svg>
+          <span>Revisión<b>Hipoteca</b></span>
+        </a>
+        <nav aria-label="Principal">
+          {nav.map(([href, label]) => <a href={href} aria-current={(href === '/' ? path === '/' : path.startsWith(href)) ? 'page' : undefined}>{label}</a>)}
+        </nav>
+      </div>
+    </header>
+    <slot name="hero" />
+    <main class="wrap" id="contenido">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="wrap foot">
+        <div>
+          <p class="foot-brand">Revisión<b>Hipoteca</b></p>
+          <p>Calculadoras de hipoteca con el euríbor oficial que publica el Banco de España en el BOE.</p>
+        </div>
+        <div>
+          <p class="foot-title">Calculadoras</p>
+          <a href="/">Revisión de la hipoteca</a>
+          <a href="/calculadora-cuota-hipoteca/">Cuota de la hipoteca</a>
+          <a href="/fijo-o-variable/">Fijo o variable</a>
+          <a href="/amortizar-hipoteca/">Amortizar: cuota o plazo</a>
+        </div>
+        <div>
+          <p class="foot-title">Euríbor</p>
+          <a href="/euribor/">Euríbor oficial mes a mes</a>
+          <a href={`/euribor/${year}/`}>Euríbor {year}</a>
+          <a href="/guias/">Guías</a>
+        </div>
+        <div>
+          <p class="foot-title">Revisión Hipoteca</p>
+          <a href="/sobre-nosotros/">Quiénes somos</a>
+          <a href="/metodologia/">Metodología</a>
+          <a href="/contacto/">Contacto</a>
+        </div>
+      </div>
+      <div class="wrap legal">
+        <span>© {year} Revisión Hipoteca. Cálculos orientativos: tu banco y tu contrato tienen la última palabra.</span>
+        <span><a href="/aviso-legal/">Aviso legal</a> <a href="/privacidad/">Privacidad</a> <a href="/cookies/">Cookies</a></span>
+      </div>
+    </footer>
+  </body>
+</html>
+<style is:global>
+  :root {
+    --paper: #ffffff; --mist: #f1f3f8; --ink: #141a33; --muted: #5b6278; --line: #dde1eb;
+    --accent: #2c46e8; --accent-ink: #1d33c4; --up: #c3283d; --up-bg: #fdecee; --down: #13804f; --down-bg: #e6f5ee; --coral: #ff5a5f;
+    --font: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; font-family: var(--font); color: var(--ink); background: var(--paper); font-size: 17px; line-height: 1.6; font-variation-settings: 'opsz' 14; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 22px; }
+  main.wrap { padding-top: 40px; padding-bottom: 72px; }
+  h1, h2, h3 { line-height: 1.15; letter-spacing: -0.01em; font-variation-settings: 'opsz' 96; }
+  h1 { font-size: clamp(2rem, 4.6vw, 3.1rem); font-weight: 760; margin: 0 0 14px; }
+  h2 { font-size: 1.55rem; font-weight: 720; margin: 2.2em 0 0.6em; }
+  h3 { font-size: 1.15rem; font-weight: 680; margin: 1.6em 0 0.4em; }
+  p { margin: 0 0 1em; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:hover { color: var(--accent-ink); }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  .muted { color: var(--muted); }
+  .lead { font-size: 1.15rem; color: #2c3350; max-width: 68ch; }
+  .prose { max-width: 70ch; }
+  .prose li { margin-bottom: 0.4em; }
+  .num, td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  th, td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+  thead th { font-size: 0.82rem; color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--line); }
+  .table-scroll { overflow-x: auto; }
+  .up { color: var(--up); } .down { color: var(--down); }
+  details { border-bottom: 1px solid var(--line); padding: 12px 0; max-width: 70ch; }
+  summary { cursor: pointer; font-weight: 650; }
+  details p { margin: 8px 0 0; }
+  .skip { position: absolute; left: -999px; }
+  .skip:focus { left: 12px; top: 12px; background: #fff; padding: 8px 12px; z-index: 10; }
+  .linklist { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+  .linklist a { display: block; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); text-decoration: none; font-weight: 650; }
+  .linklist a span { display: block; font-weight: 400; font-size: 0.92rem; color: var(--muted); }
+  .linklist a:hover { border-color: var(--accent); }
+  .btn { display: inline-block; background: var(--ink); color: #fff; border: 0; border-radius: 999px; padding: 11px 20px; font: inherit; font-weight: 650; text-decoration: none; cursor: pointer; }
+  .btn:hover { background: #222a4d; color: #fff; }
+  .field { display: grid; gap: 4px; }
+  .field label { font-size: 0.88rem; font-weight: 600; }
+  .field .hint { font-size: 0.8rem; color: var(--muted); }
+  input, select { font: inherit; font-size: 1rem; min-height: 48px; padding: 10px 12px; border: 1px solid #c9cfdc; border-radius: 10px; background: #fff; color: var(--ink); width: 100%; font-variant-numeric: tabular-nums; }
+  input:focus, select:focus { outline: 3px solid rgba(44, 70, 232, 0.25); border-color: var(--accent); }
+  .site-header { border-bottom: 1px solid var(--line); background: #fff; position: sticky; top: 0; z-index: 5; }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 62px; }
+  .brand { display: flex; align-items: center; gap: 9px; color: var(--ink); text-decoration: none; font-size: 1.08rem; font-weight: 500; }
+  .brand b, .foot-brand b { font-weight: 800; }
+  .site-header nav { display: flex; gap: 4px; overflow-x: auto; }
+  .site-header nav a { color: var(--ink); text-decoration: none; padding: 7px 11px; border-radius: 8px; font-size: 0.95rem; white-space: nowrap; }
+  .site-header nav a:hover { background: var(--mist); }
+  .site-header nav a[aria-current='page'] { background: var(--mist); font-weight: 700; }
+  .site-footer { background: var(--ink); color: #c8cde0; padding: 48px 0 24px; font-size: 0.93rem; }
+  .foot { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 28px; }
+  .foot a { display: block; color: #fff; text-decoration: none; margin-bottom: 6px; }
+  .foot a:hover { text-decoration: underline; color: #fff; }
+  .foot-brand { color: #fff; font-size: 1.15rem; margin-bottom: 6px; }
+  .foot-title { color: #fff; font-weight: 700; margin-bottom: 8px; }
+  .legal { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-top: 1px solid #2c3456; margin-top: 32px; padding-top: 18px; font-size: 0.84rem; }
+  .legal a { color: #c8cde0; margin-left: 14px; }
+  @media (max-width: 760px) {
+    .bar { flex-direction: column; align-items: flex-start; gap: 4px; padding-top: 10px; padding-bottom: 6px; }
+    .site-header nav { width: 100%; margin: 0 -11px; }
+    .site-header { position: static; }
+    .foot { grid-template-columns: 1fr 1fr; }
+    body { font-size: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>

@@ -1,0 +1,15 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+const guias = [
+  ['/guias/como-funciona-revision-hipoteca/', 'Cómo funciona la revisión de la hipoteca', 'Qué euríbor se usa, cuándo y cómo se recalcula la cuota.'],
+  ['/guias/que-es-el-euribor/', 'Qué es el euríbor', 'Quién lo calcula, qué valor usa tu hipoteca y por qué cambia.'],
+  ['/guias/diferencial-hipoteca/', 'El diferencial de la hipoteca', 'Qué es, cuánto pesa en la cuota y cómo bajarlo.'],
+];
+---
+<Base title="Guías sobre hipotecas y euríbor | Revisión Hipoteca" description="Guías claras sobre hipotecas variables: la revisión, el euríbor, el diferencial, las bonificaciones y cómo pagar menos.">
+  <Breadcrumbs items={[['Guías']]} />
+  <h1>Guías sobre tu hipoteca</h1>
+  <p class="lead">Explicaciones claras, con el euríbor oficial y ejemplos calculados.</p>
+  <ul class="linklist">{guias.map(([h, t, d]) => <li><a href={h}>{t}<span>{d}</span></a></li>)}</ul>
+</Base>

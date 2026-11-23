@@ -1,0 +1,11 @@
+---
+import Base from '../layouts/Base.astro';
+const email = 'hola@revisionhipoteca.es';
+---
+<Base title="Contacto | Revisión Hipoteca" description="Contacta con Revisión Hipoteca para sugerencias, errores o colaboraciones.">
+  <h1>Contacto</h1>
+  <section class="prose">
+    <p>Para sugerencias, errores o propuestas de colaboración, escríbenos a <a href={`mailto:${email}`}>{email}</a>. Respondemos normalmente en 48 horas laborables.</p>
+    <p>Revisión Hipoteca no es un banco ni un intermediario: no podemos gestionar préstamos ni consultar tu hipoteca. Para eso, dirígete a tu entidad.</p>
+  </section>
+</Base>

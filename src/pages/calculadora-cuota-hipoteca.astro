@@ -1,0 +1,73 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import CalcStyles from '../components/CalcStyles.astro';
+import { latestYm, value, monthLabel, pct, cuota, eur } from '../lib/euribor.js';
+import { faqLd } from '../lib/seo.js';
+const eu = value(latestYm);
+const D = { capital: 180000, anos: 25, tin: +(eu + 0.75).toFixed(2) };
+const c0 = cuota(D.capital, D.tin, D.anos * 12), tot0 = c0 * D.anos * 12;
+const faqs = [
+  ['¿Cómo se calcula la cuota de una hipoteca?', 'Con el sistema francés, que es el que usan casi todos los bancos en España: la cuota es la misma cada mes y al principio paga sobre todo intereses. La fórmula es cuota = C · i / (1 − (1 + i)^−n), donde C es el capital, i el interés mensual (TIN / 12) y n el número de meses.'],
+  ['¿Qué diferencia hay entre TIN y TAE?', 'El TIN es el interés que se aplica al capital y es el que determina la cuota. La TAE incluye además comisiones y algunos gastos, y sirve para comparar ofertas entre bancos, pero no para calcular la cuota.'],
+  ['¿Qué parte de mi sueldo debería ir a la hipoteca?', 'Como referencia habitual, se aconseja que la cuota no supere el 30-35 % de los ingresos netos del hogar. Por encima de ese nivel, una subida del euríbor o un imprevisto aprietan mucho.'],
+];
+---
+<Base title="Calculadora de cuota de hipoteca: cuánto pagarás al mes y en intereses" description={`Calcula la cuota mensual de tu hipoteca, los intereses totales y el cuadro de amortización por años. Con el euríbor oficial de ${monthLabel(latestYm)} (${pct(eu)}) como referencia.`} jsonLd={faqLd(faqs)}>
+  <CalcStyles />
+  <Breadcrumbs items={[['Calculadora de cuota']]} />
+  <h1>Calculadora de cuota de hipoteca</h1>
+  <p class="lead">Calcula lo que pagarás cada mes, cuánto se va en intereses y cómo baja la deuda año a año.</p>
+  <div class="calc-wrap">
+    <form class="calc-form" id="f" autocomplete="off">
+      <div class="field full"><label for="capital">Importe de la hipoteca</label><input id="capital" inputmode="numeric" value="180.000" /></div>
+      <div class="field"><label for="anos">Plazo en años</label><input id="anos" inputmode="numeric" value="25" /></div>
+      <div class="field"><label for="tin">Interés (TIN) anual</label><input id="tin" inputmode="decimal" value={D.tin.toLocaleString('es-ES')} />
+        <button type="button" class="linkbtn" id="useEur" data-eur={eu}>Usar euríbor actual + 0,75 %</button></div>
+    </form>
+    <div class="res" aria-live="polite">
+      <p class="label">Cuota mensual</p>
+      <p class="big" id="o-cuota">{eur(c0)}<small>al mes</small></p>
+      <dl>
+        <div><dt>Total de intereses</dt><dd id="o-int">{eur(tot0 - D.capital, 0)}</dd></div>
+        <div><dt>Total pagado</dt><dd id="o-tot">{eur(tot0, 0)}</dd></div>
+        <div><dt>Intereses en el primer año</dt><dd id="o-int1">—</dd></div>
+      </dl>
+    </div>
+  </div>
+  <h2>Cuadro de amortización por años</h2>
+  <div class="table-scroll"><table><thead><tr><th>Año</th><th class="num">Cuotas pagadas</th><th class="num">Intereses</th><th class="num">Capital amortizado</th><th class="num">Deuda pendiente</th></tr></thead><tbody id="o-tab"></tbody></table></div>
+  <section class="prose">
+    <h2>Cómo leer el resultado</h2>
+    <p>Al principio casi toda la cuota son intereses; con los años, la parte que reduce la deuda va creciendo. Por eso <a href="/amortizar-hipoteca/">amortizar anticipadamente</a> ahorra más cuanto antes se haga.</p>
+    <p>Si tu hipoteca es variable, la cuota cambiará en cada revisión según el euríbor: calcula cuánto con la <a href="/">calculadora de la revisión</a>. Si aún estás decidiendo, compara en <a href="/fijo-o-variable/">fijo o variable</a>.</p>
+    <h2>Preguntas frecuentes</h2>
+    {faqs.map(([q, a]) => (<details><summary>{q}</summary><p>{a}</p></details>))}
+  </section>
+</Base>
+<script>
+  const num = (s: string) => parseFloat(s.replace(/\./g, '').replace(',', '.'));
+  const eur = (v: number, d = 2) => v.toLocaleString('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d }) + ' €';
+  const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+  function calc() {
+    const P = num($('capital').value), n = Math.round(num($('anos').value) * 12), t = num($('tin').value);
+    if (!(P > 0) || !(n > 0) || Number.isNaN(t)) return;
+    const r = t / 100 / 12; const c = r === 0 ? P / n : (P * r) / (1 - Math.pow(1 + r, -n));
+    let saldo = P, rows = '', int1 = 0;
+    for (let y = 1; y * 12 <= n + 11; y++) {
+      let iy = 0, ky = 0, pagos = 0;
+      for (let m = 0; m < 12 && saldo > 0.005; m++) { const i = saldo * r; const k = Math.min(c - i, saldo); saldo -= k; iy += i; ky += k; pagos += i + k; }
+      if (y === 1) int1 = iy;
+      rows += `<tr><td>${y}</td><td class="num">${eur(pagos, 0)}</td><td class="num">${eur(iy, 0)}</td><td class="num">${eur(ky, 0)}</td><td class="num">${eur(Math.max(0, saldo), 0)}</td></tr>`;
+      if (saldo <= 0.005) break;
+    }
+    $('o-cuota').innerHTML = eur(c) + '<small>al mes</small>';
+    $('o-int').textContent = eur(c * n - P, 0); $('o-tot').textContent = eur(c * n, 0); $('o-int1').textContent = eur(int1, 0);
+    document.getElementById('o-tab')!.innerHTML = rows;
+  }
+  document.getElementById('f')!.addEventListener('input', calc);
+  const b = document.getElementById('useEur')!;
+  b.addEventListener('click', () => { $('tin').value = (parseFloat(b.dataset.eur!) + 0.75).toFixed(2).replace('.', ','); calc(); });
+  $('capital').addEventListener('blur', () => { const v = num($('capital').value); if (v > 0) $('capital').value = Math.round(v).toLocaleString('es-ES'); });
+  calc();
+</script>

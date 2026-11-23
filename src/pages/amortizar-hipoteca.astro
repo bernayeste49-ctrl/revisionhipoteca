@@ -1,0 +1,76 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import CalcStyles from '../components/CalcStyles.astro';
+import { latestYm, value } from '../lib/euribor.js';
+import { faqLd, articleLd } from '../lib/seo.js';
+const tin = (value(latestYm) + 0.75).toFixed(2).replace('.', ',');
+const faqs = [
+  ['¿Es mejor amortizar en cuota o en plazo?', 'Reducir plazo ahorra más intereses, porque dejas de pagar antes. Reducir cuota ahorra menos, pero te deja más dinero libre cada mes, algo útil si el euríbor sube o tus ingresos son ajustados.'],
+  ['¿Cuánto cobra el banco por amortizar anticipadamente?', 'Según la Ley 5/2019, en las hipotecas variables la comisión máxima es del 0,25 % de lo amortizado en los 3 primeros años o del 0,15 % en los 5 primeros, según el contrato; después, nada. En las fijas, hasta el 2 % durante los 10 primeros años y el 1,5 % después. Muchos bancos cobran menos o nada.'],
+  ['¿Cuándo conviene amortizar?', 'Cuanto antes en la vida del préstamo, más intereses ahorras. Antes de hacerlo, conviene tener un colchón de ahorro para imprevistos y comparar con lo que rentaría ese dinero en otro sitio.'],
+];
+---
+<Base title="Amortizar hipoteca: ¿reducir cuota o plazo? Calculadora de ahorro" description="Calcula cuánto ahorras al amortizar parte de tu hipoteca y compara reducir la cuota con reducir el plazo: nueva cuota, años menos e intereses ahorrados." jsonLd={[faqLd(faqs), articleLd({ title: 'Amortizar hipoteca: ¿reducir cuota o plazo?', description: 'Calculadora de amortización anticipada', path: '/amortizar-hipoteca/', updated: latestYm + '-01' })]}>
+  <CalcStyles />
+  <Breadcrumbs items={[['Amortizar hipoteca']]} />
+  <h1>Amortizar la hipoteca: ¿cuota o plazo?</h1>
+  <p class="lead">Si vas a adelantar dinero al banco, mira qué te conviene más: pagar menos cada mes o terminar antes.</p>
+  <div class="calc-wrap">
+    <form class="calc-form" id="f" autocomplete="off">
+      <div class="field full"><label for="capital">Capital que te queda por pagar</label><input id="capital" inputmode="numeric" value="140.000" /></div>
+      <div class="field"><label for="anos">Años que te quedan</label><input id="anos" inputmode="decimal" value="20" /></div>
+      <div class="field"><label for="tin">Interés actual (TIN)</label><input id="tin" inputmode="decimal" value={tin} /></div>
+      <div class="field full"><label for="am">Cantidad que quieres amortizar</label><input id="am" inputmode="numeric" value="10.000" /></div>
+      <div class="field full"><label for="com">Comisión de amortización</label><input id="com" inputmode="decimal" value="0" /><span class="hint">En %. Mira tu contrato; si no sabes, déjalo en 0.</span></div>
+    </form>
+    <div class="res" aria-live="polite">
+      <p class="label">Cuota actual</p>
+      <p class="big" id="o-c0">—</p>
+      <p class="muted" id="o-com"></p>
+    </div>
+  </div>
+  <div class="cmp">
+    <div class="res"><p class="label">Reducir cuota</p><p class="big" id="o-c1">—</p><dl><div><dt>Ahorro en la cuota</dt><dd id="o-c1d">—</dd></div><div><dt>Intereses que te ahorras</dt><dd id="o-c1i">—</dd></div><div><dt>Plazo</dt><dd id="o-c1p">—</dd></div></dl></div>
+    <div class="res"><p class="label">Reducir plazo</p><p class="big" id="o-p1">—</p><dl><div><dt>Cuota</dt><dd id="o-p1c">—</dd></div><div><dt>Intereses que te ahorras</dt><dd id="o-p1i">—</dd></div><div><dt>Terminas antes</dt><dd id="o-p1d">—</dd></div></dl></div>
+  </div>
+  <section class="prose">
+    <h2>Qué opción elegir</h2>
+    <ul>
+      <li><strong>Reducir plazo</strong> si te sobra margen cada mes y quieres pagar lo mínimo en intereses.</li>
+      <li><strong>Reducir cuota</strong> si tu hipoteca es variable y te preocupa la próxima <a href="/">revisión</a>, o si prefieres tener más liquidez.</li>
+    </ul>
+    <p>Para ver cómo baja tu deuda año a año, usa la <a href="/calculadora-cuota-hipoteca/">calculadora de cuota</a>. Si estás valorando cambiar de tipo, compara en <a href="/fijo-o-variable/">fijo o variable</a>.</p>
+    <h2>Preguntas frecuentes</h2>
+    {faqs.map(([q, a]) => (<details><summary>{q}</summary><p>{a}</p></details>))}
+    <p class="muted"><small>Fuente de las comisiones: <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2019-3814" rel="nofollow noopener" target="_blank">Ley 5/2019, reguladora de los contratos de crédito inmobiliario (art. 23)</a>.</small></p>
+  </section>
+</Base>
+<script>
+  const num = (s: string) => parseFloat(s.replace(/\./g, '').replace(',', '.'));
+  const eur = (v: number, d = 2) => v.toLocaleString('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d }) + ' €';
+  const cuota = (P: number, t: number, n: number) => { const r = t / 100 / 12; return r === 0 ? P / n : (P * r) / (1 - Math.pow(1 + r, -n)); };
+  const plazo = (P: number, t: number, c: number) => { const r = t / 100 / 12; return r === 0 ? P / c : -Math.log(1 - (P * r) / c) / Math.log(1 + r); };
+  const ym = (m: number) => { const a = Math.floor(m / 12), b = Math.round(m % 12); return [a ? `${a} año${a > 1 ? 's' : ''}` : '', b ? `${b} mes${b > 1 ? 'es' : ''}` : ''].filter(Boolean).join(' y ') || '0 meses'; };
+  const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+  function calc() {
+    const P = num($('capital').value), n = Math.round(num($('anos').value) * 12), t = num($('tin').value), A = num($('am').value), com = num($('com').value) || 0;
+    if (!(P > 0) || !(n > 0) || Number.isNaN(t) || !(A > 0) || A >= P) return;
+    const c0 = cuota(P, t, n), int0 = c0 * n - P, P1 = P - A;
+    const c1 = cuota(P1, t, n), int1 = c1 * n - P1;
+    const n2 = Math.ceil(plazo(P1, t, c0)), int2 = c0 * n2 - P1;
+    const coste = (A * com) / 100;
+    $('o-c0').innerHTML = eur(c0) + '<small>al mes</small>';
+    $('o-com').textContent = coste > 0 ? `Comisión por amortizar: ${eur(coste)}. Ya está restada de los ahorros.` : '';
+    $('o-c1').innerHTML = eur(c1) + '<small>al mes</small>'; $('o-c1d').textContent = '−' + eur(c0 - c1) + ' al mes';
+    $('o-c1i').textContent = eur(int0 - int1 - coste, 0); $('o-c1p').textContent = 'Igual (' + ym(n) + ')';
+    $('o-p1').innerHTML = ym(n - n2) + '<small>antes</small>'; $('o-p1c').textContent = eur(c0) + ' (igual)';
+    $('o-p1i').textContent = eur(int0 - int2 - coste, 0); $('o-p1d').textContent = 'Te quedan ' + ym(n2);
+  }
+  document.getElementById('f')!.addEventListener('input', calc);
+  calc();
+</script>
+<style>
+  .cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+  @media (max-width: 700px) { .cmp { grid-template-columns: 1fr; } }
+</style>

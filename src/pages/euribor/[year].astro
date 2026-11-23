@@ -1,0 +1,43 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { years, yearData, value, monthLabel, shiftYm, pct, signed, cuota, eur, latestYm } from '../../lib/euribor.js';
+export function getStaticPaths() { return years().map((year) => ({ params: { year } })); }
+const { year } = Astro.params;
+const d = yearData(year);
+const avg = d.reduce((s, x) => s + x.v, 0) / d.length;
+const max = d.reduce((a, b) => (b.v > a.v ? b : a)), min = d.reduce((a, b) => (b.v < a.v ? b : a));
+const first = d[0], last = d.at(-1);
+const prevY = String(+year - 1), nextY = String(+year + 1);
+const hasPrev = years().includes(prevY), hasNext = years().includes(nextY);
+const enCurso = last.ym === latestYm && last.ym.slice(5) !== '12';
+const cap = (s) => s.replace(/^./, (c) => c.toUpperCase());
+// Ejemplo: hipoteca de 150.000 € a 25 años, euríbor + 0,75 %
+const ej = (v) => cuota(150000, Math.max(0, v + 0.75), 300);
+---
+<Base title={`Euríbor ${year}: valores oficiales mes a mes${enCurso ? ` (último: ${monthLabel(last.ym)})` : ''}`} description={`Euríbor a un año en ${year} mes a mes, con los valores oficiales del Banco de España. Media del año: ${pct(avg)}; máximo en ${monthLabel(max.ym)} (${pct(max.v)}).`}>
+  <Breadcrumbs items={[['Euríbor', '/euribor/'], [year]]} />
+  <h1>Euríbor {year}</h1>
+  <p class="lead">{enCurso ? `En lo que va de ${year}` : `En ${year}`}, el euríbor a un año pasó de <strong>{pct(first.v)}</strong> en {monthLabel(first.ym)} a <strong>{pct(last.v)}</strong> en {monthLabel(last.ym)}. La media {enCurso ? 'provisional ' : ''}del año es {pct(avg)}, con un máximo de {pct(max.v)} en {monthLabel(max.ym).split(' de ')[0]} y un mínimo de {pct(min.v)} en {monthLabel(min.ym).split(' de ')[0]}.</p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Mes</th><th class="num">Euríbor a 1 año</th><th class="num">Frente al mes anterior</th><th class="num">Frente a un año antes</th><th class="num">Cuota de ejemplo*</th></tr></thead>
+      <tbody>
+        {d.map(({ ym, v }) => { const p = value(shiftYm(ym, -1)), a = value(shiftYm(ym, -12)); return (
+          <tr><td>{cap(monthLabel(ym))}</td><td class="num"><strong>{pct(v)}</strong></td><td class={`num ${p !== undefined && v - p >= 0 ? 'up' : 'down'}`}>{p !== undefined ? signed(v - p) : '—'}</td><td class={`num ${a !== undefined && v - a >= 0 ? 'up' : 'down'}`}>{a !== undefined ? signed(v - a) : '—'}</td><td class="num">{eur(ej(v))}</td></tr>
+        ); })}
+      </tbody>
+    </table>
+  </div>
+  <p class="muted note">* Cuota mensual de una hipoteca de 150.000 € a 25 años con un diferencial de 0,75 % revisada con el euríbor de ese mes. Calcula la tuya en la <a href="/">calculadora de la revisión</a>.</p>
+  <nav class="years">
+    {hasPrev && <a href={`/euribor/${prevY}/`}>← Euríbor {prevY}</a>}
+    <a href="/euribor/">Todos los años</a>
+    {hasNext && <a href={`/euribor/${nextY}/`}>Euríbor {nextY} →</a>}
+  </nav>
+  <p class="muted note">Fuente: Banco de España, tipos de interés de referencia oficiales del mercado hipotecario (publicados en el BOE).</p>
+</Base>
+<style>
+  .note { font-size: 0.85rem; margin-top: 10px; }
+  .years { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 28px; font-weight: 600; }
+</style>

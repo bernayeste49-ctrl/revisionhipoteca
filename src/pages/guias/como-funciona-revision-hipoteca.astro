@@ -1,0 +1,42 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import GuideMeta from '../../components/GuideMeta.astro';
+import { latestYm, value, monthLabel, shiftYm, pct, signed, cuota, eur } from '../../lib/euribor.js';
+import { articleLd, faqLd } from '../../lib/seo.js';
+const eu = value(latestYm), eu12 = value(shiftYm(latestYm, -12));
+const updated = new Date().toISOString().slice(0, 10);
+const path = '/guias/como-funciona-revision-hipoteca/';
+const title = 'Revisión de la hipoteca variable: cómo funciona y cómo calcular tu nueva cuota';
+const description = `Cómo revisa el banco tu hipoteca variable: qué euríbor usa, cuándo te avisa y cómo se recalcula la cuota. Con el euríbor oficial de ${monthLabel(latestYm)} (${pct(eu)}).`;
+const faqs = [["¿Me avisa el banco antes de la revisión?", "Sí. El banco debe comunicarte el nuevo tipo de interés y la nueva cuota antes de aplicarla. Si no te llega, puedes pedirla en tu oficina o consultarla en la banca online."], ["¿Puedo negociar en la revisión?", "La revisión es automática y se rige por el contrato. Lo que sí puedes negociar en cualquier momento es una mejora del diferencial, una bonificación o un cambio a tipo fijo."], ["¿Qué pasa si el euríbor es negativo?", "Si tu contrato no tiene suelo, el tipo baja hasta lo que resulte de sumar el diferencial, pero la ley impide que el banco te pague intereses: como mínimo, el tipo aplicado es cero."]];
+---
+<Base title={title} {description} jsonLd={[articleLd({ title, description, path, updated }), faqLd(faqs)]}>
+  <Breadcrumbs items={[['Guías', '/guias/'], ['Revisión de la hipoteca']]} />
+  <h1>Cómo funciona la revisión de la hipoteca variable</h1>
+  <GuideMeta updated={updated} sources={[["Banco de España, Portal del Cliente Bancario: tipos de referencia oficiales", "https://clientebancario.bde.es/pcb/es/menu-horizontal/podemosayudarte/tiposinteres/guia_textual/tiposinteresreferenciaotrostiposfrecuentes/tabla_tipos_referencia_oficiales_mercado_hipotecario.html"], ["Orden EHA/2899/2011, de transparencia y protección del cliente de servicios bancarios", "https://www.boe.es/buscar/act.php?id=BOE-A-2011-16991"], ["Ley 5/2019, reguladora de los contratos de crédito inmobiliario", "https://www.boe.es/buscar/act.php?id=BOE-A-2019-3814"]]}>
+  <section class="prose">
+    <p class="lead">En una hipoteca variable, cada 6 o 12 meses el banco cambia tu tipo de interés según el euríbor. El euríbor oficial de {monthLabel(latestYm)} es <strong>{pct(eu)}</strong>, {signed(eu - eu12)} puntos que hace un año: si tu revisión usa este mes, tu cuota {eu >= eu12 ? 'subirá' : 'bajará'}.</p>
+    <h2>Los tres datos de tu contrato que mandan</h2>
+    <ol>
+      <li><strong>Índice de referencia.</strong> Casi siempre el euríbor a un año, en su valor oficial mensual (el que publica el Banco de España en el BOE).</li>
+      <li><strong>Mes del índice.</strong> El contrato dice qué mes se toma: lo más habitual es el publicado dos meses antes de la revisión. Si revisas en marzo, se usa el euríbor de enero.</li>
+      <li><strong>Diferencial.</strong> El porcentaje fijo que se suma al euríbor, por ejemplo «euríbor + 0,75 %». Puede bajar si cumples bonificaciones (nómina, seguros…).</li>
+    </ol>
+    <h2>Cómo se recalcula la cuota</h2>
+    <p>El banco suma el euríbor del mes de referencia y tu diferencial. Con ese nuevo tipo y el capital que te queda, recalcula la cuota para los meses restantes con el sistema francés, y esa cuota se mantiene hasta la siguiente revisión.</p>
+    <p>Ejemplo: te quedan 150.000 € a 22 años con euríbor + 0,75 %. Con el euríbor de hace un año ({pct(eu12)}), la cuota sería de {eur(cuota(150000, eu12 + 0.75, 264))}; con el de {monthLabel(latestYm)} ({pct(eu)}), {eur(cuota(150000, eu + 0.75, 264))}. Calcula tu caso exacto en la <a href="/">calculadora de la revisión</a>.</p>
+    <h2>Revisión anual o semestral</h2>
+    <p>Con revisión anual, la cuota cambia una vez al año y compara con el euríbor de 12 meses antes. Con revisión semestral, cambia cada 6 meses: notas antes las subidas, pero también las bajadas.</p>
+    <h2>Si la cuota sube demasiado</h2>
+    <ul>
+      <li>Pregunta a tu banco por <strong>bonificaciones</strong> que reduzcan el diferencial. Lo explicamos en <a href="/guias/diferencial-hipoteca/">qué es el diferencial</a>.</li>
+      <li>Valora <strong>amortizar reduciendo cuota</strong>: compara opciones en la <a href="/amortizar-hipoteca/">calculadora de amortización</a>.</li>
+      <li>Estudia pasar a <strong>tipo fijo o mixto</strong>, con tu banco o con otro: mira <a href="/fijo-o-variable/">fijo o variable</a>.</li>
+    </ul>
+
+    <h2>Preguntas frecuentes</h2>
+    {faqs.map(([q, a]) => (<details><summary>{q}</summary><p>{a}</p></details>))}
+  </section>
+  </GuideMeta>
+</Base>

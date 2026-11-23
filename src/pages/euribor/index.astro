@@ -1,0 +1,36 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import EuriborChart from '../../components/EuriborChart.astro';
+import { years, yearData, latestYm, value, monthLabel, shiftYm, pct, signed, MESES } from '../../lib/euribor.js';
+const ys = years().reverse();
+const ult = value(latestYm);
+const avg = (arr) => arr.reduce((s, d) => s + d.v, 0) / arr.length;
+---
+<Base title={`Euríbor oficial mes a mes desde 1999 (último: ${monthLabel(latestYm)}, ${pct(ult)})`} description={`Todos los valores oficiales del euríbor a un año publicados por el Banco de España, mes a mes desde 1999. Último dato: ${pct(ult)} en ${monthLabel(latestYm)}.`}>
+  <Breadcrumbs items={[['Euríbor']]} />
+  <h1>Euríbor oficial mes a mes</h1>
+  <p class="lead">El euríbor a un año de {monthLabel(latestYm)} es <strong>{pct(ult)}</strong>. Debajo tienes todos los valores mensuales oficiales desde que existe el índice, en 1999: son los que usan los bancos para revisar las hipotecas variables.</p>
+  <EuriborChart n={60} caption="Últimos 5 años. Fuente: Banco de España, tipos de referencia oficiales del mercado hipotecario." />
+  <h2>Tabla por años</h2>
+  <div class="table-scroll">
+    <table class="grid">
+      <thead><tr><th>Año</th>{MESES.map((m) => <th class="num">{m.slice(0, 3)}</th>)}<th class="num">Media</th></tr></thead>
+      <tbody>
+        {ys.map((y) => { const d = yearData(y); const byM = Object.fromEntries(d.map((x) => [x.ym.slice(5), x.v])); return (
+          <tr><td><a href={`/euribor/${y}/`}>{y}</a></td>{MESES.map((_, i) => { const v = byM[String(i + 1).padStart(2, '0')]; return <td class="num">{v !== undefined ? v.toLocaleString('es-ES', { minimumFractionDigits: 3 }) : ''}</td>; })}<td class="num"><strong>{avg(d).toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 })}</strong></td></tr>
+        ); })}
+      </tbody>
+    </table>
+  </div>
+  <section class="prose">
+    <h2>Qué valor es este</h2>
+    <p>Es el <strong>tipo de referencia oficial del mercado hipotecario</strong> «euríbor a un año»: la media de los valores diarios del mes, que el Banco de España publica en el BOE a principios del mes siguiente. Es el que figura en la mayoría de los contratos de hipoteca variable en España.</p>
+    <p>¿Quieres saber qué supone para tu cuota? Usa la <a href="/">calculadora de la revisión de la hipoteca</a>.</p>
+  </section>
+</Base>
+<style>
+  .grid { font-size: 0.86rem; min-width: 900px; }
+  .grid th, .grid td { padding: 7px 6px; }
+  .grid td a { font-weight: 700; color: var(--ink); }
+</style>

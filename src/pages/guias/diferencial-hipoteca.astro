@@ -1,0 +1,36 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import GuideMeta from '../../components/GuideMeta.astro';
+import { latestYm, value, monthLabel, shiftYm, pct, signed, cuota, eur } from '../../lib/euribor.js';
+import { articleLd, faqLd } from '../../lib/seo.js';
+const eu = value(latestYm), eu12 = value(shiftYm(latestYm, -12));
+const updated = new Date().toISOString().slice(0, 10);
+const path = '/guias/diferencial-hipoteca/';
+const title = 'Diferencial de la hipoteca: qué es, cuánto se paga y cómo bajarlo con bonificaciones';
+const description = 'Qué es el diferencial de una hipoteca variable, cómo afecta a la cuota y cómo reducirlo con bonificaciones o negociando con tu banco. Con ejemplos calculados.';
+const faqs = [["¿Qué es un buen diferencial?", "Depende del momento y de tu perfil. Compara siempre varias ofertas por su TAE y fíjate en qué bonificaciones exigen para llegar al diferencial anunciado."], ["¿Me compensan las bonificaciones?", "Suma lo que te cuestan al año los productos que te piden (seguros, cuotas de tarjeta…) y compáralo con lo que te ahorras en intereses por la rebaja del diferencial. A veces sale más caro bonificar."], ["¿Puedo cambiar el diferencial de mi hipoteca?", "Sí, si el banco acepta: es una novación del contrato. También puedes llevarte la hipoteca a otro banco con mejor diferencial (subrogación)."]];
+---
+<Base title={title} {description} jsonLd={[articleLd({ title, description, path, updated }), faqLd(faqs)]}>
+  <Breadcrumbs items={[['Guías', '/guias/'], ['Diferencial']]} />
+  <h1>Qué es el diferencial de la hipoteca y cómo bajarlo</h1>
+  <GuideMeta updated={updated} sources={[["Banco de España, Portal del Cliente Bancario: tipos de referencia oficiales", "https://clientebancario.bde.es/pcb/es/menu-horizontal/podemosayudarte/tiposinteres/guia_textual/tiposinteresreferenciaotrostiposfrecuentes/tabla_tipos_referencia_oficiales_mercado_hipotecario.html"], ["Ley 5/2019, reguladora de los contratos de crédito inmobiliario", "https://www.boe.es/buscar/act.php?id=BOE-A-2019-3814"]]}>
+  <section class="prose">
+    <p class="lead">El diferencial es el porcentaje fijo que se suma al euríbor para calcular el interés de tu hipoteca variable. Si tu contrato dice «euríbor + 0,75 %» y el euríbor oficial está en {pct(eu)}, pagas un {pct(eu + 0.75, 2)}.</p>
+    <h2>Por qué importa tanto</h2>
+    <p>El diferencial se aplica durante toda la vida del préstamo. En una hipoteca de 150.000 € a 25 años con el euríbor actual, la cuota con un diferencial del 0,5 % es de {eur(cuota(150000, eu + 0.5, 300))} y con uno del 1 %, de {eur(cuota(150000, eu + 1, 300))}: {eur((cuota(150000, eu + 1, 300) - cuota(150000, eu + 0.5, 300)) * 12, 0)} más al año.</p>
+    <h2>Bonificaciones</h2>
+    <p>Muchos bancos ofrecen un diferencial más bajo si contratas otros productos: domiciliar la nómina, un seguro de hogar o de vida, un plan de pensiones o usar sus tarjetas. La rebaja suele aplicarse mientras los mantengas; si los dejas, el diferencial vuelve al valor sin bonificar en la siguiente revisión.</p>
+    <h2>Cómo bajarlo</h2>
+    <ol>
+      <li><strong>Revisa qué bonificaciones cumples</strong> y cuáles podrías cumplir sin pagar de más.</li>
+      <li><strong>Pide ofertas a otros bancos</strong> y úsalas para negociar con el tuyo.</li>
+      <li><strong>Valora cambiar a fijo o mixto</strong> si el diferencial variable es alto: compáralo en <a href="/fijo-o-variable/">fijo o variable</a>.</li>
+    </ol>
+    <p>Para ver el efecto en tu próxima cuota, prueba la <a href="/">calculadora de la revisión</a> con distintos diferenciales.</p>
+
+    <h2>Preguntas frecuentes</h2>
+    {faqs.map(([q, a]) => (<details><summary>{q}</summary><p>{a}</p></details>))}
+  </section>
+  </GuideMeta>
+</Base>
