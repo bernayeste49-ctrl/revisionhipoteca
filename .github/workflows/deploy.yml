@@ -1,0 +1,53 @@
+name: Actualizar euríbor y publicar
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    # UTC. El Banco de España publica el dato del mes durante los primeros días del mes siguiente.
+    - cron: '17 8 * * *'
+    - cron: '17 15 * * *'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Descargar el euríbor oficial del Banco de España
+        run: node scripts/update-euribor.mjs
+      - name: Guardar datos en el repositorio
+        run: |
+          git config user.name "revisionhipoteca-bot"
+          git config user.email "bot@revisionhipoteca.es"
+          git add src/data/euribor.json
+          git diff --cached --quiet || (git commit -m "Euríbor $(date -u +%F)" && git push)
+      - name: Construir la web
+        run: npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
