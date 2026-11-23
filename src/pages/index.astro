@@ -31,7 +31,7 @@ const ultimos = months.slice(-13).reverse();
   <section slot="hero" class="hero">
     <div class="wrap hero-grid">
       <div class="intro">
-        <p class="kicker">Euríbor oficial de {monthLabel(latestYm)}: <strong>{pct(ult)}</strong> <span class={ult - anio >= 0 ? 'up' : 'down'}>({signed(ult - anio)} en un año)</span></p>
+        <p class="kicker">Calculadora de la revisión · <span class={ult - anio >= 0 ? 'up' : 'down'}>El euríbor está {signed(ult - anio)} puntos {ult - anio >= 0 ? 'más alto' : 'más bajo'} que hace un año</span></p>
         <h1>¿Cuánto te subirá la hipoteca en la próxima revisión?</h1>
         <p class="lead">Pon los datos de tu hipoteca variable y te decimos la cuota nueva con el euríbor oficial que usará tu banco.</p>
       </div>
@@ -43,6 +43,11 @@ const ultimos = months.slice(-13).reverse();
           <div class="field"><label for="mes">Mes de la próxima revisión</label><select id="mes">{proximas.map((ym) => <option value={ym} selected={ym === defRev}>{monthLabel(ym)}</option>)}</select></div>
           <div class="field"><label for="lag">Euríbor que aplica tu banco</label><select id="lag"><option value="1">El de 1 mes antes</option><option value="2" selected>El de 2 meses antes (lo más habitual)</option><option value="3">El de 3 meses antes</option></select></div>
         </form>
+        <ul class="trust">
+          <li>Euríbor oficial del Banco de España</li>
+          <li>Gratis y sin registro</li>
+          <li>Tus datos no salen de tu navegador</li>
+        </ul>
       <div class="ticket" aria-live="polite">
         <p class="t-head">Tu revisión de <span id="r-mes">{monthLabel(defRev)}</span></p>
         <dl>
@@ -53,6 +58,7 @@ const ultimos = months.slice(-13).reverse();
         <p class="t-year" id="r-year">{(diff >= 0 ? 'Pagarás ' : 'Ahorrarás ') + eur(Math.abs(diff * D.periodo), 0) + (diff >= 0 ? ' más' : '') + ` en los próximos ${D.periodo} meses`}</p>
         <hr />
         <p class="t-idx" id="r-idx">Euríbor de {monthLabel(idxOld)}: {pct(value(idxOld))} → {monthLabel(usaNew)}: {pct(value(usaNew))}</p>
+        <p class="t-how"><a href="/guias/como-funciona-revision-hipoteca/">Cómo se calcula</a> · Estimación orientativa</p>
         <p class="t-note" id="r-note" hidden={usaNew === idxNew}>El euríbor de {monthLabel(idxNew)} aún no se ha publicado: usamos el último oficial ({monthLabel(latestYm)}).</p>
       </div>
     </div>
@@ -86,6 +92,15 @@ const ultimos = months.slice(-13).reverse();
   </section>
 
   <section>
+    <h2>Si la cuota te sube demasiado</h2>
+    <div class="steps">
+      <div><h3>Revisa tu diferencial</h3><p>Las bonificaciones por nómina o seguros pueden rebajarlo. A veces compensa, a veces no: <a href="/guias/diferencial-hipoteca/">cómo saberlo</a>.</p></div>
+      <div><h3>Amortiza reduciendo cuota</h3><p>Si tienes ahorros, adelantar dinero baja la cuota desde el mes siguiente. <a href="/amortizar-hipoteca/">Calcula cuánto</a>.</p></div>
+      <div><h3>Valora pasar a fijo</h3><p>Pierdes la posible bajada del euríbor, pero ganas una cuota estable. <a href="/fijo-o-variable/">Compara las dos</a>.</p></div>
+    </div>
+  </section>
+
+  <section>
     <h2>Otras calculadoras</h2>
     <ul class="linklist">
       <li><a href="/calculadora-cuota-hipoteca/">Calculadora de cuota<span>Lo que pagarás al mes y en intereses.</span></a></li>
@@ -98,7 +113,6 @@ const ultimos = months.slice(-13).reverse();
     <h2>Preguntas frecuentes</h2>
     {faqs.map(([q, a]) => (<details><summary>{q}</summary><p>{a}</p></details>))}
   </section>
-  <p class="muted small">Cálculos orientativos. Las condiciones de tu préstamo (suelo, bonificaciones, redondeos) y la liquidación de tu banco son las que cuentan.</p>
 </Base>
 
 <script is:inline type="application/json" id="eur-data" set:html={JSON.stringify(raw)}></script>
@@ -137,9 +151,12 @@ const ultimos = months.slice(-13).reverse();
 
 <style>
   .hero { background: var(--mist); border-bottom: 1px solid var(--line); }
-  .hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; grid-template-areas: 'intro ticket' 'form ticket'; column-gap: 48px; row-gap: 0; padding-top: 44px; padding-bottom: 52px; align-items: start; }
+  .hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; grid-template-areas: 'intro ticket' 'form ticket' 'trust ticket'; column-gap: 48px; row-gap: 0; padding-top: 44px; padding-bottom: 52px; align-items: start; }
   .kicker { font-size: 0.95rem; margin-bottom: 14px; }
-  .intro { grid-area: intro; } .ticket { grid-area: ticket; } .calc { grid-area: form; align-items: start; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 18px; margin-top: 22px; }
+  .intro { grid-area: intro; } .ticket { grid-area: ticket; } .trust { grid-area: trust; list-style: none; padding: 0; margin: 22px 0 0; display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 0.9rem; color: #2c3350; }
+  .trust li::before { content: ''; display: inline-block; width: 14px; height: 8px; border-left: 2.5px solid var(--down); border-bottom: 2.5px solid var(--down); transform: rotate(-45deg) translateY(-3px); margin-right: 9px; }
+  .t-how { font-size: 0.82rem; color: var(--muted); margin: 8px 0 0; }
+  .t-how a { color: var(--muted); } .calc { grid-area: form; align-items: start; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 18px; margin-top: 22px; }
   .ticket { background: #fff; border-radius: 18px; padding: 26px 26px 20px; box-shadow: 0 1px 0 var(--line), 0 18px 40px -24px rgba(20, 26, 51, 0.45); position: sticky; top: 86px;
     background-image: radial-gradient(circle at 0 50%, var(--mist) 10px, transparent 11px), radial-gradient(circle at 100% 50%, var(--mist) 10px, transparent 11px); }
   .t-head { font-weight: 700; margin-bottom: 14px; }
@@ -155,9 +172,13 @@ const ultimos = months.slice(-13).reverse();
   .t-note { font-size: 0.82rem; color: var(--muted); margin: 6px 0 0; }
   .t-note[hidden] { display: none; }
   .hist td a { color: var(--ink); }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .steps h3 { margin-top: 0; }
+  .steps p { color: #2c3350; margin: 0; }
+  @media (max-width: 760px) { .steps { grid-template-columns: 1fr; gap: 18px; } }
   .small { font-size: 0.85rem; margin-top: 32px; }
   @media (max-width: 900px) {
-    .hero-grid { grid-template-columns: 1fr; grid-template-areas: 'intro' 'ticket' 'form'; row-gap: 22px; padding-top: 28px; }
+    .hero-grid { grid-template-columns: 1fr; grid-template-areas: 'intro' 'ticket' 'form' 'trust'; row-gap: 22px; padding-top: 28px; }
     .calc { margin-top: 0; }
     .ticket { position: static; }
   }

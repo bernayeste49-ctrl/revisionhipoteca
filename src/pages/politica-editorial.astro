@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+---
+<Base title="Política editorial | Revisión Hipoteca" description="Cómo elaboramos, revisamos y corregimos los contenidos y las calculadoras de Revisión Hipoteca, y cómo nos financiamos.">
+  <Breadcrumbs items={[['Política editorial']]} />
+  <h1>Política editorial</h1>
+  <section class="prose">
+    <p class="lead">Hablamos de dinero y de hipotecas, así que nos tomamos en serio la exactitud. Estas son nuestras reglas.</p>
+    <h2>Fuentes</h2>
+    <p>Todos los datos del euríbor proceden del Banco de España (tipos de referencia oficiales del mercado hipotecario, publicados en el BOE). Las explicaciones sobre derechos, comisiones y normativa se basan en el texto de las leyes y en la información oficial del Banco de España, y citamos la fuente al final de cada guía.</p>
+    <h2>Cómo revisamos</h2>
+    <ul>
+      <li>Cada cifra de una guía se comprueba contra su fuente antes de publicarse.</li>
+      <li>Los ejemplos numéricos se calculan con las mismas fórmulas que las calculadoras, y se actualizan solos cuando cambia el euríbor.</li>
+      <li>Las páginas indican la fecha de su última actualización.</li>
+    </ul>
+    <h2>Independencia</h2>
+    <p>Revisión Hipoteca no pertenece a ningún banco ni intermediario y no cobra comisiones por recomendar productos. Nos financiamos con publicidad, que se muestra separada del contenido y nunca influye en lo que publicamos.</p>
+    <h2>Lo que no hacemos</h2>
+    <p>No damos asesoramiento financiero personalizado ni recomendamos un banco concreto. Las calculadoras ofrecen estimaciones; para decisiones importantes, consulta a tu entidad o a un profesional independiente.</p>
+    <h2>Correcciones</h2>
+    <p>Si encuentras un error, escríbenos a <a href="mailto:hola@revisionhipoteca.es">hola@revisionhipoteca.es</a>. Lo revisamos, lo corregimos si procede y actualizamos la fecha de la página.</p>
+  </section>
+</Base>

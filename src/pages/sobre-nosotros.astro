@@ -1,14 +1,25 @@
 ---
 import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+const ld = { '@context': 'https://schema.org', '@type': 'AboutPage', mainEntity: { '@type': 'Person', name: 'Bernat Yeste', jobTitle: 'Desarrollador web', worksFor: { '@type': 'Organization', name: 'Revisión Hipoteca', url: 'https://revisionhipoteca.es/' } } };
 ---
-<Base title="Sobre Revisión Hipoteca" description="Quién hay detrás de Revisión Hipoteca, de dónde salen los datos del euríbor y cómo se hacen los cálculos.">
-  <h1>Sobre Revisión Hipoteca</h1>
+<Base title="Quiénes somos | Revisión Hipoteca" description="Quién hay detrás de Revisión Hipoteca, de dónde salen los datos del euríbor, cómo se hacen los cálculos y cómo se financia la web." jsonLd={ld}>
+  <Breadcrumbs items={[['Quiénes somos']]} />
+  <h1>Quiénes somos</h1>
   <section class="prose">
-    <p>Revisión Hipoteca nace para responder rápido a una pregunta que se hacen millones de personas con hipoteca variable: <strong>cuánto me va a subir (o bajar) la cuota en la próxima revisión</strong>.</p>
-    <p>La web la crea y mantiene <strong>Bernat Yeste</strong>, desarrollador web de Igualada (Barcelona). Las calculadoras están programadas a medida y funcionan en tu navegador: los datos que introduces no salen de tu dispositivo.</p>
+    <p class="lead">Revisión Hipoteca responde rápido a una pregunta que se hacen millones de personas con hipoteca variable: <strong>cuánto me va a subir (o bajar) la cuota en la próxima revisión</strong>.</p>
+    <h2>Quién hay detrás</h2>
+    <p>La web la crea y mantiene <strong>Bernat Yeste</strong>, desarrollador web de Igualada (Barcelona). Las calculadoras están programadas a medida y funcionan en tu navegador: lo que escribes en ellas no se envía a ningún servidor.</p>
+    <h2>Por qué puedes fiarte de los datos</h2>
+    <ul>
+      <li><strong>Datos oficiales:</strong> usamos el euríbor que publica el Banco de España en el BOE, el mismo que aplican los bancos en las revisiones.</li>
+      <li><strong>Actualización automática:</strong> la web consulta al Banco de España cada día y se actualiza en cuanto hay un dato nuevo.</li>
+      <li><strong>Fórmulas a la vista:</strong> explicamos cómo calculamos cada resultado en la <a href="/metodologia/">metodología</a>.</li>
+      <li><strong>Fuentes citadas:</strong> cada guía enlaza a la normativa o la fuente oficial en la que se basa. Más en nuestra <a href="/politica-editorial/">política editorial</a>.</li>
+    </ul>
+    <h2>Cómo nos financiamos</h2>
     <p>Revisión Hipoteca es independiente: no es un banco ni un intermediario de crédito, y no cobra por recomendar hipotecas. Se financia con publicidad.</p>
-    <h2>De dónde salen los datos</h2>
-    <p>Usamos el <strong>euríbor a un año oficial</strong>, el tipo de referencia del mercado hipotecario que publica el Banco de España en el BOE cada mes. Se actualiza automáticamente en cuanto se publica. Más detalles en la <a href="/metodologia/">metodología</a>.</p>
-    <p>¿Has visto un error? Escríbenos desde <a href="/contacto/">contacto</a> y lo corregimos.</p>
+    <h2>Contacto</h2>
+    <p>¿Has visto un error o tienes una sugerencia? Escríbenos a <a href="mailto:hola@revisionhipoteca.es">hola@revisionhipoteca.es</a>.</p>
   </section>
 </Base>

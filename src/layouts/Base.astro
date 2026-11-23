@@ -1,5 +1,8 @@
 ---
 import '@fontsource-variable/bricolage-grotesque';
+import meta from '../data/meta.json';
+import { value, monthLabel, pct } from '../lib/euribor.js';
+const fechaBOE = meta.fechaBOE ? new Date(meta.fechaBOE + 'T12:00:00Z').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : null;
 interface Props { title: string; description: string; jsonLd?: object | object[]; noindex?: boolean }
 const { title, description, jsonLd, noindex = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
@@ -25,6 +28,7 @@ const year = new Date().getFullYear();
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#141a33" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_ES" />
@@ -49,6 +53,12 @@ const year = new Date().getFullYear();
         </nav>
       </div>
     </header>
+    <div class="databar">
+      <div class="wrap databar-in">
+        <span><span class="live" aria-hidden="true"></span>Euríbor oficial de {monthLabel(meta.ultimoMes)}: <strong>{pct(value(meta.ultimoMes))}</strong></span>
+        <span class="databar-src">{fechaBOE ? `Publicado en el BOE el ${fechaBOE}` : 'Fuente: Banco de España'} · <a href="/metodologia/">Fuente y método</a></span>
+      </div>
+    </div>
     <slot name="hero" />
     <main class="wrap" id="contenido">
       <slot />
@@ -57,7 +67,8 @@ const year = new Date().getFullYear();
       <div class="wrap foot">
         <div>
           <p class="foot-brand">Revisión<b>Hipoteca</b></p>
-          <p>Calculadoras de hipoteca con el euríbor oficial que publica el Banco de España en el BOE.</p>
+          <p>Calculadoras de hipoteca gratuitas con el euríbor oficial que publica el Banco de España en el BOE.</p>
+          <p class="foot-mail"><a href="mailto:hola@revisionhipoteca.es">hola@revisionhipoteca.es</a></p>
         </div>
         <div>
           <p class="foot-title">Calculadoras</p>
@@ -76,11 +87,15 @@ const year = new Date().getFullYear();
           <p class="foot-title">Revisión Hipoteca</p>
           <a href="/sobre-nosotros/">Quiénes somos</a>
           <a href="/metodologia/">Metodología</a>
+          <a href="/politica-editorial/">Política editorial</a>
           <a href="/contacto/">Contacto</a>
         </div>
       </div>
+      <div class="wrap disclaimer">
+        <p>Revisión Hipoteca es un proyecto independiente: no es un banco, ni un intermediario de crédito, ni presta asesoramiento financiero. Los cálculos son orientativos; las condiciones de tu contrato y la liquidación de tu entidad son las que cuentan. Datos del euríbor: Banco de España, tipos de referencia oficiales del mercado hipotecario.</p>
+      </div>
       <div class="wrap legal">
-        <span>© {year} Revisión Hipoteca. Cálculos orientativos: tu banco y tu contrato tienen la última palabra.</span>
+        <span>© {year} Revisión Hipoteca · Bernat Yeste Biosca</span>
         <span><a href="/aviso-legal/">Aviso legal</a> <a href="/privacidad/">Privacidad</a> <a href="/cookies/">Cookies</a></span>
       </div>
     </footer>
@@ -134,7 +149,7 @@ const year = new Date().getFullYear();
   .field .hint { font-size: 0.8rem; color: var(--muted); }
   input, select { font: inherit; font-size: 1rem; min-height: 48px; padding: 10px 12px; border: 1px solid #c9cfdc; border-radius: 10px; background: #fff; color: var(--ink); width: 100%; font-variant-numeric: tabular-nums; }
   input:focus, select:focus { outline: 3px solid rgba(44, 70, 232, 0.25); border-color: var(--accent); }
-  .site-header { border-bottom: 1px solid var(--line); background: #fff; position: sticky; top: 0; z-index: 5; }
+  .site-header { border-bottom: 1px solid var(--line); background: rgba(255,255,255,0.96); backdrop-filter: saturate(1.4) blur(6px); position: sticky; top: 0; z-index: 5; }
   .bar { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 62px; }
   .brand { display: flex; align-items: center; gap: 9px; color: var(--ink); text-decoration: none; font-size: 1.08rem; font-weight: 500; }
   .brand b, .foot-brand b { font-weight: 800; }
@@ -142,13 +157,21 @@ const year = new Date().getFullYear();
   .site-header nav a { color: var(--ink); text-decoration: none; padding: 7px 11px; border-radius: 8px; font-size: 0.95rem; white-space: nowrap; }
   .site-header nav a:hover { background: var(--mist); }
   .site-header nav a[aria-current='page'] { background: var(--mist); font-weight: 700; }
+  .databar { background: var(--ink); color: #d6daea; font-size: 0.84rem; }
+  .databar-in { display: flex; justify-content: space-between; gap: 6px 18px; flex-wrap: wrap; padding-top: 7px; padding-bottom: 7px; }
+  .databar strong { color: #fff; font-variant-numeric: tabular-nums; }
+  .databar a { color: #fff; }
+  @media (max-width: 760px) { .databar-src { display: none; } }
+  .live { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #3ddc97; margin-right: 8px; vertical-align: 1px; }
+  .disclaimer p { font-size: 0.82rem; color: #9aa1bd; max-width: 92ch; margin: 28px 0 0; }
+  .foot-mail a { display: inline; }
   .site-footer { background: var(--ink); color: #c8cde0; padding: 48px 0 24px; font-size: 0.93rem; }
   .foot { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 28px; }
   .foot a { display: block; color: #fff; text-decoration: none; margin-bottom: 6px; }
   .foot a:hover { text-decoration: underline; color: #fff; }
   .foot-brand { color: #fff; font-size: 1.15rem; margin-bottom: 6px; }
   .foot-title { color: #fff; font-weight: 700; margin-bottom: 8px; }
-  .legal { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-top: 1px solid #2c3456; margin-top: 32px; padding-top: 18px; font-size: 0.84rem; }
+  .legal { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-top: 1px solid #2c3456; margin-top: 20px; padding-top: 18px; font-size: 0.84rem; }
   .legal a { color: #c8cde0; margin-left: 14px; }
   @media (max-width: 760px) {
     .bar { flex-direction: column; align-items: flex-start; gap: 4px; padding-top: 10px; padding-bottom: 6px; }

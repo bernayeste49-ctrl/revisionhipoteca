@@ -34,7 +34,7 @@ jobs:
         run: |
           git config user.name "revisionhipoteca-bot"
           git config user.email "bot@revisionhipoteca.es"
-          git add src/data/euribor.json
+          git add src/data/euribor.json src/data/meta.json
           git diff --cached --quiet || (git commit -m "Euríbor $(date -u +%F)" && git push)
       - name: Construir la web
         run: npm run build

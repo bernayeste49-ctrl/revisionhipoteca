@@ -3,7 +3,7 @@ interface Props { updated: string; sources?: [string, string][] }
 const { updated, sources = [] } = Astro.props;
 const d = new Date(updated + 'T12:00:00Z').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
 ---
-<p class="muted byline">Por <a href="/sobre-nosotros/">Bernat Yeste</a> · Actualizado el {d}</p>
+<p class="byline">Por <a href="/sobre-nosotros/">Bernat Yeste</a> · Actualizado el {d} · <a href="/politica-editorial/">Cómo elaboramos este contenido</a></p>
 <slot />
 {sources.length > 0 && (
   <section class="sources">
@@ -11,7 +11,15 @@ const d = new Date(updated + 'T12:00:00Z').toLocaleDateString('es-ES', { day: 'n
     <ul>{sources.map(([t, u]) => <li><a href={u} rel="nofollow noopener" target="_blank">{t}</a></li>)}</ul>
   </section>
 )}
+<aside class="author">
+  <p class="author-name">Escrito por Bernat Yeste</p>
+  <p>Desarrollador web y creador de Revisión Hipoteca. Escribe las guías a partir de la normativa y los datos oficiales del Banco de España y el BOE, y revisa cada cálculo con las calculadoras de esta web. No es asesor financiero: si tienes dudas sobre tu caso concreto, consulta a tu entidad o a un profesional.</p>
+</aside>
 <style>
-  .byline { margin-top: -8px; }
+  .byline { color: var(--muted); font-size: 0.9rem; margin-top: -4px; }
+  .byline a { color: var(--muted); }
   .sources li { font-size: 0.9rem; }
+  .author { margin-top: 36px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 14px; max-width: 70ch; font-size: 0.93rem; color: #2c3350; }
+  .author p { margin: 0; }
+  .author-name { font-weight: 700; color: var(--ink); margin-bottom: 4px !important; }
 </style>
