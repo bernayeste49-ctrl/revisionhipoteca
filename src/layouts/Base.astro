@@ -1,5 +1,6 @@
 ---
 import '@fontsource-variable/bricolage-grotesque';
+import '@fontsource-variable/public-sans';
 import meta from '../data/meta.json';
 import { value, monthLabel, pct } from '../lib/euribor.js';
 const fechaBOE = meta.fechaBOE ? new Date(meta.fechaBOE + 'T12:00:00Z').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : null;
@@ -43,7 +44,7 @@ const year = new Date().getFullYear();
   <body>
     <a class="skip" href="#contenido">Saltar al contenido</a>
     <header class="site-header">
-      <div class="wrap bar">
+      <div class="wrap hbar">
         <a class="brand" href="/" aria-label="Revisión Hipoteca, inicio">
           <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#141a33"/><path d="M8 21.5 14 15l4 4 6-7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="11.5" r="2.6" fill="#ff5a5f"/></svg>
           <span>Revisión<b>Hipoteca</b></span>
@@ -103,19 +104,19 @@ const year = new Date().getFullYear();
 </html>
 <style is:global>
   :root {
-    --paper: #ffffff; --mist: #f1f3f8; --ink: #141a33; --muted: #5b6278; --line: #dde1eb;
+    --paper: #ffffff; --mist: #f1f3f8; --canvas: #f4f6fa; --ink: #111833; --muted: #596079; --line: #e1e5ee;
     --accent: #2c46e8; --accent-ink: #1d33c4; --up: #c3283d; --up-bg: #fdecee; --down: #13804f; --down-bg: #e6f5ee; --coral: #ff5a5f;
-    --font: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+    --font: 'Public Sans Variable', system-ui, sans-serif; --display: 'Bricolage Grotesque Variable', 'Public Sans Variable', sans-serif;
   }
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
-  body { margin: 0; font-family: var(--font); color: var(--ink); background: var(--paper); font-size: 17px; line-height: 1.6; font-variation-settings: 'opsz' 14; }
+  body { margin: 0; font-family: var(--font); color: var(--ink); background: var(--paper); font-size: 16.5px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
   .wrap { max-width: 1120px; margin: 0 auto; padding: 0 22px; }
   main.wrap { padding-top: 40px; padding-bottom: 72px; }
-  h1, h2, h3 { line-height: 1.15; letter-spacing: -0.01em; font-variation-settings: 'opsz' 96; }
-  h1 { font-size: clamp(2rem, 4.6vw, 3.1rem); font-weight: 760; margin: 0 0 14px; }
-  h2 { font-size: 1.55rem; font-weight: 720; margin: 2.2em 0 0.6em; }
-  h3 { font-size: 1.15rem; font-weight: 680; margin: 1.6em 0 0.4em; }
+  h1, h2, h3 { font-family: var(--display); line-height: 1.12; letter-spacing: -0.015em; }
+  h1 { font-size: clamp(2.1rem, 4.8vw, 3.4rem); font-weight: 780; margin: 0 0 16px; letter-spacing: -0.025em; }
+  h2 { font-size: clamp(1.45rem, 2.4vw, 1.8rem); font-weight: 740; margin: 2.2em 0 0.6em; }
+  h3 { font-size: 1.12rem; font-weight: 700; margin: 1.6em 0 0.4em; }
   p { margin: 0 0 1em; }
   a { color: var(--accent); text-underline-offset: 3px; }
   a:hover { color: var(--accent-ink); }
@@ -133,8 +134,12 @@ const year = new Date().getFullYear();
   .table-scroll td, .table-scroll th { white-space: nowrap; }
   .table-scroll td:first-child { white-space: normal; }
   .up { color: var(--up); } .down { color: var(--down); }
-  details { border-bottom: 1px solid var(--line); padding: 12px 0; max-width: 70ch; }
-  summary { cursor: pointer; font-weight: 650; }
+  details { border-bottom: 1px solid var(--line); padding: 16px 0; max-width: 76ch; }
+  details:first-of-type { border-top: 1px solid var(--line); }
+  summary { cursor: pointer; font-weight: 650; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: '+'; font-size: 1.3rem; line-height: 1; color: var(--muted); }
+  details[open] summary::after { content: '−'; }
   details p { margin: 8px 0 0; }
   .skip { position: absolute; left: -999px; }
   .skip:focus { left: 12px; top: 12px; background: #fff; padding: 8px 12px; z-index: 10; }
@@ -145,13 +150,18 @@ const year = new Date().getFullYear();
   .btn { display: inline-block; background: var(--ink); color: #fff; border: 0; border-radius: 999px; padding: 11px 20px; font: inherit; font-weight: 650; text-decoration: none; cursor: pointer; }
   .btn:hover { background: #222a4d; color: #fff; }
   .field { display: grid; gap: 4px; }
-  .field label { font-size: 0.88rem; font-weight: 600; }
+  .field label { font-size: 0.84rem; font-weight: 600; color: #2c3350; }
+  .inp { position: relative; display: flex; align-items: center; }
+  .inp input { padding-right: 52px; }
+  .inp span { position: absolute; right: 12px; color: var(--muted); font-size: 0.9rem; pointer-events: none; }
   .field .hint { font-size: 0.8rem; color: var(--muted); }
-  input, select { font: inherit; font-size: 1rem; min-height: 48px; padding: 10px 12px; border: 1px solid #c9cfdc; border-radius: 10px; background: #fff; color: var(--ink); width: 100%; font-variant-numeric: tabular-nums; }
-  input:focus, select:focus { outline: 3px solid rgba(44, 70, 232, 0.25); border-color: var(--accent); }
+  input, select { font: inherit; font-size: 1rem; font-weight: 500; min-height: 48px; padding: 10px 12px; border: 1px solid #cdd3e0; border-radius: 12px; background: #fff; transition: border-color 0.15s, box-shadow 0.15s; color: var(--ink); width: 100%; font-variant-numeric: tabular-nums; }
+  input:hover, select:hover { border-color: #aab2c6; }
+  input:focus, select:focus { outline: none; box-shadow: 0 0 0 4px rgba(44, 70, 232, 0.16); border-color: var(--accent); }
+  select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, #596079 50%), linear-gradient(135deg, #596079 50%, transparent 50%); background-position: calc(100% - 18px) 21px, calc(100% - 13px) 21px; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 34px; }
   .site-header { border-bottom: 1px solid var(--line); background: rgba(255,255,255,0.96); backdrop-filter: saturate(1.4) blur(6px); position: sticky; top: 0; z-index: 5; }
-  .bar { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 62px; }
-  .brand { display: flex; align-items: center; gap: 9px; color: var(--ink); text-decoration: none; font-size: 1.08rem; font-weight: 500; }
+  .hbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 68px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-family: var(--display); font-size: 1.15rem; font-weight: 500; letter-spacing: -0.01em; }
   .brand b, .foot-brand b { font-weight: 800; }
   .site-header nav { display: flex; gap: 4px; overflow-x: auto; }
   .site-header nav a { color: var(--ink); text-decoration: none; padding: 7px 11px; border-radius: 8px; font-size: 0.95rem; white-space: nowrap; }
@@ -169,12 +179,12 @@ const year = new Date().getFullYear();
   .foot { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 28px; }
   .foot a { display: block; color: #fff; text-decoration: none; margin-bottom: 6px; }
   .foot a:hover { text-decoration: underline; color: #fff; }
-  .foot-brand { color: #fff; font-size: 1.15rem; margin-bottom: 6px; }
+  .foot-brand { color: #fff; font-family: var(--display); font-size: 1.2rem; margin-bottom: 6px; }
   .foot-title { color: #fff; font-weight: 700; margin-bottom: 8px; }
   .legal { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-top: 1px solid #2c3456; margin-top: 20px; padding-top: 18px; font-size: 0.84rem; }
   .legal a { color: #c8cde0; margin-left: 14px; }
   @media (max-width: 760px) {
-    .bar { flex-direction: column; align-items: flex-start; gap: 4px; padding-top: 10px; padding-bottom: 6px; }
+    .hbar { flex-direction: column; align-items: flex-start; gap: 4px; padding-top: 10px; padding-bottom: 6px; }
     .site-header nav { width: 100%; margin: 0 -11px; }
     .site-header { position: static; }
     .foot { grid-template-columns: 1fr 1fr; }

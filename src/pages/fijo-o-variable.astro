@@ -20,15 +20,16 @@ const faqs = [
   <p class="lead">Pon las dos ofertas y mira qué pagarías con cada una si el euríbor se mantiene, sube o baja durante toda la hipoteca.</p>
   <div class="calc-wrap">
     <form class="calc-form" id="f" autocomplete="off">
-      <div class="field full"><label for="capital">Importe de la hipoteca</label><input id="capital" inputmode="numeric" value="180.000" /></div>
-      <div class="field full"><label for="anos">Plazo en años</label><input id="anos" inputmode="numeric" value="25" /></div>
-      <div class="field"><label for="fijo">Tipo fijo (TIN)</label><input id="fijo" inputmode="decimal" value="2,90" /></div>
-      <div class="field"><label for="dif">Variable: diferencial</label><input id="dif" inputmode="decimal" value="0,75" /><span class="hint">Euríbor + este %.</span></div>
+      <div class="field full"><label for="capital">Importe de la hipoteca</label><div class="inp"><input id="capital" inputmode="numeric" value="180.000" /><span>€</span></div></div>
+      <div class="field full"><label for="anos">Plazo en años</label><div class="inp"><input id="anos" inputmode="numeric" value="25" /><span>años</span></div></div>
+      <div class="field"><label for="fijo">Tipo fijo (TIN)</label><div class="inp"><input id="fijo" inputmode="decimal" value="2,90" /><span>%</span></div></div>
+      <div class="field"><label for="dif">Variable: euríbor +</label><div class="inp"><input id="dif" inputmode="decimal" value="0,75" /><span>%</span></div></div>
     </form>
     <div class="res" aria-live="polite">
       <p class="label">Cuota fija durante toda la hipoteca</p>
       <p class="big" id="o-fijo">—</p>
       <p class="muted" id="o-fijo-tot"></p>
+      <dl><div><dt>Variable con el euríbor actual</dt><dd id="o-var">—</dd></div><div><dt>Diferencia al mes</dt><dd id="o-vd">—</dd></div><div><dt>Diferencia en intereses totales</dt><dd id="o-vt">—</dd></div></dl>
     </div>
   </div>
   <p class="calc-note">Cálculo orientativo con el sistema de amortización francés, el que usan casi todos los bancos. Lo que escribes no sale de tu navegador. <a href="/metodologia/">Ver fórmulas</a>.</p>
@@ -61,6 +62,7 @@ const faqs = [
     const cf = cuota(P, f, n), intF = cf * n - P;
     $('o-fijo').innerHTML = eur(cf) + '<small>al mes</small>';
     $('o-fijo-tot').textContent = `Total de intereses: ${eur(intF, 0)}`;
+    { const cv = cuota(P, Math.max(0, eu + dif), n), iv = cv * n - P; $('o-var').textContent = eur(cv) + ' al mes'; $('o-vd').textContent = (cv - cf >= 0 ? '+' : '−') + eur(Math.abs(cv - cf)) + ' frente a la fija'; $('o-vt').textContent = (iv - intF >= 0 ? '+' : '−') + eur(Math.abs(iv - intF), 0); }
     const esc: [string, number][] = [['Media de los últimos 10 años', avg10], ['Baja 1 punto', Math.max(eu - 1, -0.5)], ['Se queda como ahora', eu], ['Sube 1 punto', eu + 1]];
     document.getElementById('o-tab')!.innerHTML = esc.map(([name, e]) => {
       const cv = cuota(P, Math.max(0, e + dif), n), iv = cv * n - P, d = cv - cf, dt = iv - intF;

@@ -29,88 +29,98 @@ const ultimos = months.slice(-13).reverse();
 ---
 <Base title={`¿Cuánto subirá mi hipoteca? Calculadora de la revisión con el euríbor de ${monthLabel(latestYm)}`} description={`Calcula tu nueva cuota en la próxima revisión de la hipoteca variable con el euríbor oficial (${pct(ult)} en ${monthLabel(latestYm)}). Gratis, sin registro y en segundos.`} jsonLd={ld}>
   <section slot="hero" class="hero">
-    <div class="wrap hero-grid">
-      <div class="intro">
-        <p class="kicker">Calculadora de la revisión · <span class={ult - anio >= 0 ? 'up' : 'down'}>El euríbor está {Math.abs(ult - anio).toLocaleString('es-ES', { maximumFractionDigits: 2 })} puntos {ult - anio >= 0 ? 'más alto' : 'más bajo'} que hace un año</span></p>
-        <h1>¿Cuánto te subirá la hipoteca en la próxima revisión?</h1>
-        <p class="lead">Pon los datos de tu hipoteca variable y te decimos la cuota nueva con el euríbor oficial que usará tu banco.</p>
-      </div>
+    <div class="wrap">
+      <p class="kicker"><span class="tag">Calculadora gratuita</span> El euríbor oficial está <strong class={ult - anio >= 0 ? 'up' : 'down'}>{Math.abs(ult - anio).toLocaleString('es-ES', { maximumFractionDigits: 2 })} puntos {ult - anio >= 0 ? 'más alto' : 'más bajo'}</strong> que hace un año</p>
+      <h1>¿Cuánto te subirá la hipoteca en la próxima revisión?</h1>
+      <p class="lead">Introduce los datos de tu hipoteca variable y calcula al instante tu nueva cuota con el euríbor oficial que aplicará tu banco.</p>
+
+      <div class="panel">
         <form id="rev" class="calc" autocomplete="off">
-          <div class="field"><label for="capital">Capital que te queda por pagar</label><input id="capital" inputmode="numeric" value="150.000" /><span class="hint">En euros. Lo ves en el recibo o en la app del banco.</span></div>
-          <div class="field"><label for="anos">Años que te quedan</label><input id="anos" inputmode="decimal" value="22" /></div>
-          <div class="field"><label for="dif">Diferencial</label><input id="dif" inputmode="decimal" value="0,75" /><span class="hint">El «euríbor + X %» de tu contrato.</span></div>
-          <div class="field"><label for="periodo">Tu hipoteca se revisa</label><select id="periodo"><option value="12" selected>Cada año</option><option value="6">Cada 6 meses</option></select></div>
-          <div class="field"><label for="mes">Mes de la próxima revisión</label><select id="mes">{proximas.map((ym) => <option value={ym} selected={ym === defRev}>{monthLabel(ym)}</option>)}</select></div>
-          <div class="field"><label for="lag">Euríbor que aplica tu banco</label><select id="lag"><option value="1">El de 1 mes antes</option><option value="2" selected>El de 2 meses antes (lo más habitual)</option><option value="3">El de 3 meses antes</option></select></div>
+          <p class="panel-title">Datos de tu hipoteca</p>
+          <div class="field"><label for="capital">Capital pendiente</label><div class="inp"><input id="capital" inputmode="numeric" value="150.000" /><span>€</span></div></div>
+          <div class="field"><label for="anos">Plazo restante</label><div class="inp"><input id="anos" inputmode="decimal" value="22" /><span>años</span></div></div>
+          <div class="field"><label for="dif">Diferencial</label><div class="inp"><input id="dif" inputmode="decimal" value="0,75" /><span>%</span></div></div>
+          <div class="field"><label for="periodo">Revisión</label><select id="periodo"><option value="12" selected>Anual</option><option value="6">Semestral</option></select></div>
+          <div class="field wide-m"><label for="mes">Próxima revisión</label><select id="mes">{proximas.map((ym) => <option value={ym} selected={ym === defRev}>{monthLabel(ym).replace(/^(\w{3})\w* de /, '$1 ').replace(/^./, (c) => c.toUpperCase())}</option>)}</select></div>
+          <div class="field wide-m"><label for="lag">Euríbor aplicado</label><select id="lag"><option value="1">1 mes antes</option><option value="2" selected>2 meses antes</option><option value="3">3 meses antes</option></select></div>
+          <p class="calc-hint">El capital pendiente y el diferencial aparecen en tu recibo o en la app de tu banco. La mayoría de contratos usan el euríbor de dos meses antes.</p>
         </form>
-        <ul class="trust">
-          <li>Euríbor oficial del Banco de España</li>
-          <li>Gratis y sin registro</li>
-          <li>Tus datos no salen de tu navegador</li>
-        </ul>
-      <div class="ticket" aria-live="polite">
-        <p class="t-head">Tu revisión de <span id="r-mes">{monthLabel(defRev)}</span></p>
-        <dl>
-          <div><dt>Cuota hasta ahora</dt><dd id="r-old">{eur(cOld)}</dd></div>
-          <div><dt>Cuota nueva</dt><dd id="r-new">{eur(cNew)}</dd></div>
-        </dl>
-        <p class="t-diff"><span id="r-diff" class={diff >= 0 ? 'up' : 'down'}>{(diff >= 0 ? '+' : '−') + eur(Math.abs(diff))}</span><small>al mes</small></p>
-        <p class="t-year" id="r-year">{(diff >= 0 ? 'Pagarás ' : 'Ahorrarás ') + eur(Math.abs(diff * D.periodo), 0) + (diff >= 0 ? ' más' : '') + ` en los próximos ${D.periodo} meses`}</p>
-        <hr />
-        <p class="t-idx" id="r-idx">Euríbor de {monthLabel(idxOld)}: {pct(value(idxOld))} → {monthLabel(usaNew)}: {pct(value(usaNew))}</p>
-        <p class="t-how"><a href="/guias/como-funciona-revision-hipoteca/">Cómo se calcula</a> · Estimación orientativa</p>
-        <p class="t-note" id="r-note" hidden={usaNew === idxNew}>El euríbor de {monthLabel(idxNew)} aún no se ha publicado: usamos el último oficial ({monthLabel(latestYm)}).</p>
+        <div class="result" aria-live="polite">
+          <p class="r-label">Tu revisión de <span id="r-mes">{monthLabel(defRev)}</span></p>
+          <p class="r-diff"><span id="r-diff" class={diff >= 0 ? 'up' : 'down'}>{(diff >= 0 ? '+' : '−') + eur(Math.abs(diff))}</span> <small>al mes</small></p>
+          <p class="r-year" id="r-year">{(diff >= 0 ? 'Pagarás ' : 'Ahorrarás ') + eur(Math.abs(diff * D.periodo), 0) + (diff >= 0 ? ' más' : '') + ` en los próximos ${D.periodo} meses`}</p>
+          <div class="bars">
+            <div class="bar-row"><span>Cuota actual</span><strong id="r-old">{eur(cOld)}</strong></div>
+            <div class="bar"><i id="b-old" style={`width:${(Math.min(cOld, cNew) / Math.max(cOld, cNew)) * 100 * (cOld <= cNew ? 1 : 1)}%`}></i></div>
+            <div class="bar-row"><span>Cuota nueva</span><strong id="r-new">{eur(cNew)}</strong></div>
+            <div class="bar new"><i id="b-new" style={`width:${(cNew / Math.max(cOld, cNew)) * 100}%`}></i></div>
+          </div>
+          <p class="r-idx" id="r-idx">Euríbor de {monthLabel(idxOld)}: {pct(value(idxOld))} → {monthLabel(usaNew)}: {pct(value(usaNew))}</p>
+          <p class="r-note" id="r-note" hidden={usaNew === idxNew}>El euríbor de {monthLabel(idxNew)} aún no se ha publicado: usamos el último oficial ({monthLabel(latestYm)}).</p>
+          <p class="r-how">Estimación orientativa · <a href="/guias/como-funciona-revision-hipoteca/">Cómo se calcula</a></p>
+        </div>
       </div>
+      <ul class="trust">
+        <li>Euríbor oficial del Banco de España</li>
+        <li>Gratis y sin registro</li>
+        <li>Tus datos no salen de tu navegador</li>
+      </ul>
     </div>
   </section>
 
-  <section>
-    <h2>El euríbor oficial de los últimos meses</h2>
-    <p>Es la media mensual del euríbor a un año que publica el Banco de España en el BOE como tipo de referencia oficial del mercado hipotecario. En {monthLabel(latestYm)} quedó en <strong>{pct(ult)}</strong>, {signed(ult - prev)} puntos respecto al mes anterior y {signed(ult - anio)} respecto a hace un año.</p>
-    <EuriborChart n={24} caption="Euríbor a un año, valor oficial mensual. Fuente: Banco de España." />
-    <div class="table-scroll">
+  <section class="block">
+    <div class="block-head">
+      <h2>El euríbor oficial, mes a mes</h2>
+      <p>La media mensual del euríbor a un año que publica el Banco de España en el BOE: el valor que usan los bancos en la revisión.</p>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><span class="k">{monthLabel(latestYm).replace(/^./, (c) => c.toUpperCase())}</span><span class="v">{pct(ult)}</span><span class="s">Último dato oficial</span></div>
+      <div class="kpi"><span class="k">Frente al mes anterior</span><span class={`v ${ult - prev >= 0 ? 'up' : 'down'}`}>{signed(ult - prev)}</span><span class="s">puntos</span></div>
+      <div class="kpi"><span class="k">Frente a hace un año</span><span class={`v ${ult - anio >= 0 ? 'up' : 'down'}`}>{signed(ult - anio)}</span><span class="s">puntos</span></div>
+    </div>
+    <div class="card chart-card">
+      <EuriborChart n={24} caption="Euríbor a un año, valor oficial mensual de los últimos 24 meses. Fuente: Banco de España." />
+    </div>
+    <div class="card table-card table-scroll">
       <table class="hist">
-        <thead><tr><th>Mes</th><th class="num">Euríbor a 1 año</th><th class="num">Frente al mes anterior</th><th class="num">Frente a hace un año</th></tr></thead>
+        <thead><tr><th>Mes</th><th class="num">Euríbor a 1 año</th><th class="num">Mes anterior</th><th class="num">Hace un año</th></tr></thead>
         <tbody>
-          {ultimos.map((ym) => { const v = value(ym), p = value(shiftYm(ym, -1)), a = value(shiftYm(ym, -12)); return (
-            <tr><td><a href={`/euribor/${ym.slice(0, 4)}/`}>{monthLabel(ym).replace(/^./, (c) => c.toUpperCase())}</a></td><td class="num"><strong>{pct(v)}</strong></td><td class={`num ${v - p >= 0 ? 'up' : 'down'}`}>{signed(v - p)}</td><td class={`num ${v - a >= 0 ? 'up' : 'down'}`}>{a !== undefined ? signed(v - a) : '—'}</td></tr>
+          {ultimos.slice(0, 6).map((ym) => { const v = value(ym), p = value(shiftYm(ym, -1)), a = value(shiftYm(ym, -12)); return (
+            <tr><td>{monthLabel(ym).replace(/^./, (c) => c.toUpperCase())}</td><td class="num"><strong>{pct(v)}</strong></td><td class={`num ${v - p >= 0 ? 'up' : 'down'}`}>{signed(v - p)}</td><td class={`num ${v - a >= 0 ? 'up' : 'down'}`}>{a !== undefined ? signed(v - a) : '—'}</td></tr>
           ); })}
         </tbody>
       </table>
+      <a class="more" href="/euribor/">Ver todos los meses desde 1999</a>
     </div>
-    <p><a href="/euribor/">Ver el euríbor oficial de todos los meses desde 1999</a></p>
   </section>
 
-  <section class="prose">
-    <h2>Cómo calcula tu banco la nueva cuota</h2>
-    <ol>
-      <li><strong>Busca el índice de referencia.</strong> Casi siempre es el euríbor oficial a un año de un mes concreto, normalmente dos meses antes de la revisión.</li>
-      <li><strong>Le suma tu diferencial.</strong> Si el euríbor es 3,239 % y tu diferencial 0,75 %, tu nuevo tipo es 3,989 %.</li>
-      <li><strong>Recalcula la cuota</strong> con el capital que te queda y los meses pendientes, con el sistema francés: cuota constante hasta la siguiente revisión.</li>
+  <section class="block">
+    <div class="block-head">
+      <h2>Cómo calcula tu banco la nueva cuota</h2>
+      <p>Tres pasos, siempre los mismos. Si los conoces, puedes comprobar la carta de tu banco.</p>
+    </div>
+    <ol class="steps">
+      <li><h3>Toma el índice</h3><p>El euríbor oficial a un año del mes que fija tu contrato, normalmente dos meses antes de la revisión.</p></li>
+      <li><h3>Suma tu diferencial</h3><p>Con un euríbor del {pct(ult)} y un diferencial del 0,75 %, el nuevo tipo es del {pct(ult + 0.75)}.</p></li>
+      <li><h3>Recalcula la cuota</h3><p>Con el capital y los meses que te quedan, por el sistema francés. La cuota se mantiene hasta la siguiente revisión.</p></li>
     </ol>
-    <p>Si tu contrato tiene <strong>cláusula suelo</strong> o bonificaciones por nómina y seguros, el tipo puede ser distinto. Lo explicamos en <a href="/guias/como-funciona-revision-hipoteca/">cómo funciona la revisión de la hipoteca</a>.</p>
+    <p class="aside">Si tu contrato tiene cláusula suelo o bonificaciones, el tipo puede ser distinto. Más detalles en <a href="/guias/como-funciona-revision-hipoteca/">cómo funciona la revisión de la hipoteca</a>.</p>
   </section>
 
-  <section>
-    <h2>Si la cuota te sube demasiado</h2>
-    <div class="steps">
-      <div><h3>Revisa tu diferencial</h3><p>Las bonificaciones por nómina o seguros pueden rebajarlo. A veces compensa, a veces no: <a href="/guias/diferencial-hipoteca/">cómo saberlo</a>.</p></div>
-      <div><h3>Amortiza reduciendo cuota</h3><p>Si tienes ahorros, adelantar dinero baja la cuota desde el mes siguiente. <a href="/amortizar-hipoteca/">Calcula cuánto</a>.</p></div>
-      <div><h3>Valora pasar a fijo</h3><p>Pierdes la posible bajada del euríbor, pero ganas una cuota estable. <a href="/fijo-o-variable/">Compara las dos</a>.</p></div>
+  <section class="block">
+    <div class="block-head">
+      <h2>Si la cuota te sube demasiado</h2>
+      <p>Tres salidas habituales, cada una con su calculadora o su guía.</p>
+    </div>
+    <div class="options">
+      <a class="option" href="/guias/diferencial-hipoteca/"><h3>Revisa tu diferencial</h3><p>Las bonificaciones por nómina o seguros pueden rebajarlo. Aprende a saber si te compensan.</p><span>Leer la guía</span></a>
+      <a class="option" href="/amortizar-hipoteca/"><h3>Amortiza reduciendo cuota</h3><p>Adelantar dinero baja la cuota desde el mes siguiente. Calcula cuánto te ahorras.</p><span>Abrir la calculadora</span></a>
+      <a class="option" href="/fijo-o-variable/"><h3>Valora pasar a fijo</h3><p>Renuncias a una posible bajada a cambio de una cuota estable. Compara las dos opciones.</p><span>Comparar fijo y variable</span></a>
     </div>
   </section>
 
-  <section>
-    <h2>Otras calculadoras</h2>
-    <ul class="linklist">
-      <li><a href="/calculadora-cuota-hipoteca/">Calculadora de cuota<span>Lo que pagarás al mes y en intereses.</span></a></li>
-      <li><a href="/fijo-o-variable/">¿Fijo o variable?<span>Compara lo que pagarías con cada uno.</span></a></li>
-      <li><a href="/amortizar-hipoteca/">Amortizar: cuota o plazo<span>Cuánto ahorras con cada opción.</span></a></li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>Preguntas frecuentes</h2>
+  <section class="block">
+    <div class="block-head"><h2>Preguntas frecuentes</h2></div>
     {faqs.map(([q, a]) => (<details><summary>{q}</summary><p>{a}</p></details>))}
   </section>
 </Base>
@@ -139,6 +149,7 @@ const ultimos = months.slice(-13).reverse();
     const cO = cuota(P, Math.max(0, E[idxOld] + dif), n), cN = cuota(P, Math.max(0, E[usa] + dif), n), d = cN - cO;
     $('r-mes').textContent = label(mes);
     $('r-old').textContent = eur(cO); $('r-new').textContent = eur(cN);
+    const mx = Math.max(cO, cN); ($('b-old') as any).style.width = (cO / mx) * 100 + '%'; ($('b-new') as any).style.width = (cN / mx) * 100 + '%';
     const rd = $('r-diff'); rd.textContent = (d >= 0 ? '+' : '−') + eur(Math.abs(d)); rd.className = d >= 0 ? 'up' : 'down';
     $('r-year').textContent = (d >= 0 ? 'Pagarás ' : 'Ahorrarás ') + eur(Math.abs(d * periodo), 0) + (d >= 0 ? ' más' : '') + ` en los próximos ${periodo} meses`;
     $('r-idx').textContent = `Euríbor de ${label(idxOld)}: ${pct(E[idxOld])} → ${label(usa)}: ${pct(E[usa])}`;
@@ -150,37 +161,76 @@ const ultimos = months.slice(-13).reverse();
 </script>
 
 <style>
-  .hero { background: var(--mist); border-bottom: 1px solid var(--line); }
-  .hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; grid-template-areas: 'intro ticket' 'form ticket' 'trust ticket'; column-gap: 48px; row-gap: 0; padding-top: 44px; padding-bottom: 52px; align-items: start; }
-  .kicker { font-size: 0.95rem; margin-bottom: 14px; }
-  .intro { grid-area: intro; } .ticket { grid-area: ticket; } .trust { grid-area: trust; list-style: none; padding: 0; margin: 22px 0 0; display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 0.9rem; color: #2c3350; }
-  .trust li::before { content: ''; display: inline-block; width: 14px; height: 8px; border-left: 2.5px solid var(--down); border-bottom: 2.5px solid var(--down); transform: rotate(-45deg) translateY(-3px); margin-right: 9px; }
-  .t-how { font-size: 0.82rem; color: var(--muted); margin: 8px 0 0; }
-  .t-how a { color: var(--muted); } .calc { grid-area: form; align-items: start; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 18px; margin-top: 22px; }
-  .ticket { background: #fff; border-radius: 18px; padding: 26px 26px 20px; box-shadow: 0 1px 0 var(--line), 0 18px 40px -24px rgba(20, 26, 51, 0.45); position: sticky; top: 86px;
-    background-image: radial-gradient(circle at 0 50%, var(--mist) 10px, transparent 11px), radial-gradient(circle at 100% 50%, var(--mist) 10px, transparent 11px); }
-  .t-head { font-weight: 700; margin-bottom: 14px; }
-  .ticket dl { margin: 0; display: grid; gap: 8px; }
-  .ticket dl div { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dashed var(--line); padding-bottom: 8px; }
-  .ticket dt { color: var(--muted); }
-  .ticket dd { margin: 0; font-weight: 650; font-variant-numeric: tabular-nums; font-size: 1.1rem; }
-  .t-diff { margin: 18px 0 2px; font-size: clamp(2.6rem, 6vw, 3.6rem); font-weight: 800; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; font-variation-settings: 'opsz' 96; }
-  .t-diff small { font-size: 1rem; font-weight: 500; color: var(--muted); margin-left: 8px; letter-spacing: 0; }
-  .t-year { font-weight: 600; margin-bottom: 12px; }
-  .ticket hr { border: 0; border-top: 1px dashed var(--line); margin: 12px 0; }
-  .t-idx { font-size: 0.88rem; color: var(--muted); margin: 0; }
-  .t-note { font-size: 0.82rem; color: var(--muted); margin: 6px 0 0; }
-  .t-note[hidden] { display: none; }
-  .hist td a { color: var(--ink); }
-  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-  .steps h3 { margin-top: 0; }
-  .steps p { color: #2c3350; margin: 0; }
-  @media (max-width: 760px) { .steps { grid-template-columns: 1fr; gap: 18px; } }
-  .small { font-size: 0.85rem; margin-top: 32px; }
-  @media (max-width: 900px) {
-    .hero-grid { grid-template-columns: 1fr; grid-template-areas: 'intro' 'ticket' 'form' 'trust'; row-gap: 22px; padding-top: 28px; }
-    .calc { margin-top: 0; }
-    .ticket { position: static; }
+  .hero { background: var(--canvas); border-bottom: 1px solid var(--line); padding: 52px 0 40px; }
+  .kicker { font-size: 0.92rem; color: var(--muted); margin-bottom: 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .tag { background: #fff; border: 1px solid var(--line); color: var(--ink); font-weight: 600; font-size: 0.8rem; padding: 4px 10px; border-radius: 999px; }
+  .hero h1 { max-width: 19ch; }
+  .hero .lead { margin-bottom: 30px; }
+  .panel { display: grid; grid-template-columns: 1.4fr 1fr; background: #fff; border: 1px solid var(--line); border-radius: 22px; box-shadow: 0 30px 60px -40px rgba(17, 24, 51, 0.45); overflow: hidden; }
+  .calc { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px 16px; padding: 28px; align-content: start; }
+  .calc > .field { grid-column: span 2; }
+  .panel-title { grid-column: 1 / -1; margin: 0; font-family: var(--display); font-weight: 700; font-size: 1.1rem; }
+  .calc select { padding-left: 12px; padding-right: 30px; background-position: calc(100% - 16px) 21px, calc(100% - 11px) 21px; }
+  .calc-hint { grid-column: 1 / -1; margin: 2px 0 0; font-size: 0.82rem; color: var(--muted); }
+  .result { background: var(--ink); color: #fff; padding: 28px 30px; display: flex; flex-direction: column; }
+  .r-label { color: #aeb5cf; margin: 0 0 6px; font-size: 0.95rem; }
+  .r-diff { margin: 0; font-family: var(--display); font-size: clamp(2.8rem, 5.6vw, 4rem); font-weight: 800; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .r-diff .up { color: #ff8a8f; } .r-diff .down { color: #5fe3a8; }
+  .r-diff small { font-family: var(--font); font-size: 1rem; font-weight: 500; color: #aeb5cf; letter-spacing: 0; }
+  .r-year { margin: 10px 0 22px; font-weight: 600; }
+  .bars { display: grid; gap: 6px; margin-bottom: 20px; }
+  .bar-row { display: flex; justify-content: space-between; font-size: 0.9rem; color: #c7cce0; margin-top: 6px; }
+  .bar-row strong { color: #fff; font-variant-numeric: tabular-nums; }
+  .bar { height: 8px; background: #252d52; border-radius: 99px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: #6f7aa8; border-radius: 99px; transition: width 0.25s ease; }
+  .bar.new i { background: var(--coral); }
+  .r-idx { font-size: 0.85rem; color: #aeb5cf; margin: auto 0 4px; padding-top: 14px; border-top: 1px solid #2a3358; }
+  .r-note { font-size: 0.8rem; color: #aeb5cf; margin: 0 0 4px; }
+  .r-note[hidden] { display: none; }
+  .r-how { font-size: 0.8rem; color: #8f97b8; margin: 0; }
+  .r-how a { color: #c7cce0; }
+  .trust { list-style: none; padding: 0; margin: 20px 0 0; display: flex; flex-wrap: wrap; gap: 8px 26px; font-size: 0.9rem; color: #2c3350; }
+  .trust li::before { content: ''; display: inline-block; width: 12px; height: 7px; border-left: 2px solid var(--down); border-bottom: 2px solid var(--down); transform: rotate(-45deg) translateY(-3px); margin-right: 10px; }
+  .block { margin-top: 72px; }
+  .block:first-child { margin-top: 24px; }
+  .block-head { margin-bottom: 22px; max-width: 64ch; }
+  .block-head h2 { margin: 0 0 6px; }
+  .block-head p { color: var(--muted); margin: 0; }
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 14px; }
+  .kpi { border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; display: grid; gap: 2px; }
+  .kpi .k { font-size: 0.85rem; color: var(--muted); }
+  .kpi .v { font-family: var(--display); font-size: 2rem; font-weight: 750; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .kpi .s { font-size: 0.8rem; color: var(--muted); }
+  .card { border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; margin-bottom: 14px; }
+  .table-card { padding: 6px 22px 16px; }
+  .table-card table { min-width: 480px; }
+  .more { display: inline-block; margin-top: 12px; font-weight: 600; text-decoration: none; }
+  .more::after { content: ' ›'; }
+  .steps { list-style: none; counter-reset: s; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .steps li { counter-increment: s; border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; }
+  .steps li::before { content: counter(s); display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: #fff; font-weight: 700; font-size: 0.9rem; margin-bottom: 12px; }
+  .steps h3 { margin: 0 0 6px; }
+  .steps p { margin: 0; color: #3a4160; font-size: 0.96rem; }
+  .aside { color: var(--muted); font-size: 0.92rem; margin-top: 14px; }
+  .options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .option { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 16px; padding: 22px; color: var(--ink); text-decoration: none; transition: border-color 0.15s, box-shadow 0.15s; }
+  .option:hover { border-color: var(--ink); box-shadow: 0 10px 24px -18px rgba(17, 24, 51, 0.5); color: var(--ink); }
+  .option h3 { margin: 0 0 6px; }
+  .option p { color: #3a4160; font-size: 0.96rem; flex: 1; }
+  .option span { font-weight: 650; color: var(--accent); font-size: 0.92rem; }
+  .option span::after { content: ' ›'; }
+  @media (max-width: 960px) {
+    .panel { grid-template-columns: 1fr; }
+    .calc { padding: 22px; }
+    .steps, .options { grid-template-columns: 1fr; }
   }
-  @media (max-width: 520px) { .calc { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) {
+    .hero { padding: 32px 0 28px; }
+    .calc { grid-template-columns: 1fr 1fr; gap: 14px 12px; }
+    .calc > .field { grid-column: span 1; }
+    .calc > .field.wide-m { grid-column: 1 / -1; }
+    .result { padding: 24px 22px; }
+    .kpis { grid-template-columns: 1fr; }
+    .kpi .v { font-size: 1.7rem; }
+  }
 </style>

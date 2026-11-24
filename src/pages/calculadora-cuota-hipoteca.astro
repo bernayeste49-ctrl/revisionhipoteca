@@ -20,9 +20,9 @@ const faqs = [
   <p class="lead">Calcula lo que pagarás cada mes, cuánto se va en intereses y cómo baja la deuda año a año.</p>
   <div class="calc-wrap">
     <form class="calc-form" id="f" autocomplete="off">
-      <div class="field full"><label for="capital">Importe de la hipoteca</label><input id="capital" inputmode="numeric" value="180.000" /></div>
-      <div class="field"><label for="anos">Plazo en años</label><input id="anos" inputmode="numeric" value="25" /></div>
-      <div class="field"><label for="tin">Interés (TIN) anual</label><input id="tin" inputmode="decimal" value={D.tin.toLocaleString('es-ES')} />
+      <div class="field full"><label for="capital">Importe de la hipoteca</label><div class="inp"><input id="capital" inputmode="numeric" value="180.000" /><span>€</span></div></div>
+      <div class="field"><label for="anos">Plazo en años</label><div class="inp"><input id="anos" inputmode="numeric" value="25" /><span>años</span></div></div>
+      <div class="field"><label for="tin">Interés (TIN) anual</label><div class="inp"><input id="tin" inputmode="decimal" value={D.tin.toLocaleString('es-ES')} /><span>%</span></div>
         <button type="button" class="linkbtn" id="useEur" data-eur={eu}>Usar euríbor actual + 0,75 %</button></div>
     </form>
     <div class="res" aria-live="polite">

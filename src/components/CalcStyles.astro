@@ -1,9 +1,13 @@
 <style is:global>
-  .calc-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: start; margin: 20px 0 8px; }
-  .calc-form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; align-items: start; background: var(--mist); border-radius: 16px; padding: 22px; }
+  .calc-wrap { display: grid; grid-template-columns: 1.15fr 1fr; gap: 0; align-items: stretch; margin: 24px 0 8px; border: 1px solid var(--line); border-radius: 22px; overflow: hidden; box-shadow: 0 30px 60px -44px rgba(17, 24, 51, 0.45); }
+  .calc-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-content: start; background: #fff; padding: 28px; }
   .calc-form .full { grid-column: 1 / -1; }
-  .res { border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
-  .res .big { font-size: clamp(2.2rem, 5vw, 3rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; font-variant-numeric: tabular-nums; margin: 4px 0 6px; }
+  .res { border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+  .calc-wrap > .res { border: 0; border-radius: 0; background: var(--ink); color: #fff; padding: 28px 30px; }
+  .calc-wrap > .res .label, .calc-wrap > .res .muted, .calc-wrap > .res dt { color: #aeb5cf; }
+  .calc-wrap > .res dl div { border-color: #2a3358; }
+  .calc-wrap > .res .big small { color: #aeb5cf; }
+  .res .big { font-family: var(--display); font-size: clamp(2.3rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; font-variant-numeric: tabular-nums; margin: 4px 0 6px; }
   .res .big small { font-size: 1rem; font-weight: 500; color: var(--muted); margin-left: 6px; letter-spacing: 0; }
   .res dl { display: grid; gap: 6px; margin: 14px 0 0; }
   .res dl div { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px dashed var(--line); padding-bottom: 6px; }
@@ -13,5 +17,6 @@
   .calc-note a { color: var(--muted); }
   .linkbtn { background: none; border: 0; padding: 0; color: var(--accent); font: inherit; font-size: 0.85rem; text-decoration: underline; cursor: pointer; justify-self: start; }
   @media (max-width: 860px) { .calc-wrap { grid-template-columns: 1fr; } }
+  .linkbtn { color: var(--accent); }
   @media (max-width: 480px) { .calc-form { grid-template-columns: 1fr; } }
 </style>
